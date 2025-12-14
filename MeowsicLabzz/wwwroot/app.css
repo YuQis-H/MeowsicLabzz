@@ -49,3 +49,29 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.bg-purple {
+    background-color: #2a1f4d; /* deep bluish purple */
+    color: #f5f5f5;
+    border-radius: 12px;
+}
+
+.input-purple {
+    background-color: #3b2a66;
+    border: 1px solid #5a4d8c;
+    color: #fff;
+}
+
+    .input-purple:focus {
+        border-color: #9a7dff;
+        box-shadow: 0 0 0 0.2rem rgba(154, 125, 255, 0.25);
+    }
+
+.button-primary {
+    background-color: #6c63ff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    color: #fff;
+    font-weight: bold;
+}
