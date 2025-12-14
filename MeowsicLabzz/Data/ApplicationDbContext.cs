@@ -15,8 +15,9 @@ namespace MeowsicLabzz.Data
 		{
 			base.OnModelCreating(builder);
 
-			// Apply your role seed configuration
-			builder.ApplyConfiguration(new RoleSeed());
+			builder.ApplyConfiguration(new MeowsicLabzz.Data.Configurations.Entities.RoleSeed());
+			builder.ApplyConfiguration(new MeowsicLabzz.Configurations.Entities.UserSeed());
+			builder.ApplyConfiguration(new MeowsicLabzz.Configurations.Entities.UserRoleSeed());
 		}
 	}
 }
