@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MeowsicLabzz.Migrations
 {
-    [DbContext(typeof(IdentityContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20251214015054_InitialCreate")]
     partial class InitialCreate
     {
