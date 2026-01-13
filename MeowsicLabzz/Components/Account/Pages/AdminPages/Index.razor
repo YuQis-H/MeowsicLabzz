@@ -1,0 +1,27 @@
+﻿@page "/admin"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>🎛 Admin Dashboard</h3>
+<p>Heyyoo! Manage your music data below:</p>
+
+<div class="list-group">
+    <NavLink class="list-group-item list-group-item-action" href="/admin/moods">
+        🎭 Manage Moods
+    </NavLink>
+    <NavLink class="list-group-item list-group-item-action" href="/admin/genres">
+        🎼 Manage Genres
+    </NavLink>
+    <NavLink class="list-group-item list-group-item-action" href="/admin/artists">
+        🎤 Manage Artists
+    </NavLink>
+    <NavLink class="list-group-item list-group-item-action" href="/admin/songs">
+        🎵 Manage Songs
+    </NavLink>
+    <NavLink class="list-group-item list-group-item-action" href="/admin/albums">
+        💿 Manage Albums
+    </NavLink>
+    <NavLink class="list-group-item list-group-item-action" href="/admin/users">
+        👤 Manage Users
+    </NavLink>
+</div>

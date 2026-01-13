@@ -1,0 +1,8 @@
+﻿@page "/admin/moods"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+
+<h3>🎭 Manage Moods</h3>
+
+<!-- Later you can scaffold CRUD here -->
+<p>This page will allow admins to add, edit, and delete moods.</p>
