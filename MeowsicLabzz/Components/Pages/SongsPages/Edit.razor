@@ -1,0 +1,124 @@
+﻿@page "/songs/edit"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.MeowsicLabzzContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Songs</h2>
+<hr />
+@if (Songs is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Songs" OnValidSubmit="UpdateSongs" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Songs.Id" value="@Songs.Id" />
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title:</label>
+                    <InputText id="title" @bind-Value="Songs.Title" class="form-control" />
+                    <ValidationMessage For="() => Songs.Title" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="duration" class="form-label">Duration:</label>
+                    <InputNumber id="duration" @bind-Value="Songs.Duration" class="form-control" />
+                    <ValidationMessage For="() => Songs.Duration" class="text-danger" />
+                </div>                                                              
+                <div class="mb-3">
+                    <label for="artistid" class="form-label">ArtistID:</label>
+                    <InputNumber id="artistid" @bind-Value="Songs.ArtistID" class="form-control" />
+                    <ValidationMessage For="() => Songs.ArtistID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="albumsid" class="form-label">AlbumsID:</label>
+                    <InputNumber id="albumsid" @bind-Value="Songs.AlbumsID" class="form-control" />
+                    <ValidationMessage For="() => Songs.AlbumsID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdat" class="form-label">CreatedAt:</label>
+                    <InputDate id="createdat" @bind-Value="Songs.CreatedAt" class="form-control" />
+                    <ValidationMessage For="() => Songs.CreatedAt" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedat" class="form-label">UpdatedAt:</label>
+                    <InputDate id="updatedat" @bind-Value="Songs.UpdatedAt" class="form-control" />
+                    <ValidationMessage For="() => Songs.UpdatedAt" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">Createdby:</label>
+                    <InputText id="createdby" @bind-Value="Songs.Createdby" class="form-control" />
+                    <ValidationMessage For="() => Songs.Createdby" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">UpdatedBy:</label>
+                    <InputText id="updatedby" @bind-Value="Songs.UpdatedBy" class="form-control" />
+                    <ValidationMessage For="() => Songs.UpdatedBy" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/songs">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Songs? Songs { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Songs ??= await context.Songs.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Songs is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateSongs()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Songs!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!SongsExists(Songs!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/songs");
+    }
+
+    private bool SongsExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Songs.Any(e => e.Id == id);
+    }
+}

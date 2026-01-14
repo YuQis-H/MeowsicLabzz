@@ -1,0 +1,56 @@
+﻿@page "/users/details"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.MeowsicLabzzContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Users</h2>
+    <hr />
+    @if (users is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Username</dt>
+            <dd class="col-sm-10">@users.Username</dd>
+            <dt class="col-sm-2">Email</dt>
+            <dd class="col-sm-10">@users.Email</dd>
+            <dt class="col-sm-2">CreatedAt</dt>
+            <dd class="col-sm-10">@users.CreatedAt</dd>
+            <dt class="col-sm-2">UpdatedAt</dt>
+            <dd class="col-sm-10">@users.UpdatedAt</dd>
+            <dt class="col-sm-2">Createdby</dt>
+            <dd class="col-sm-10">@users.Createdby</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@users.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/users/edit?id={users.Id}")">Edit</a> |
+            <a href="@($"/users")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Users? users;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        users = await context.Users.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (users is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

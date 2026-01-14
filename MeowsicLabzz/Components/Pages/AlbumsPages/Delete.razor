@@ -1,0 +1,79 @@
+﻿@page "/albums/delete"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.MeowsicLabzzContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Albums</h2>
+    <hr />
+    @if (albums is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@albums.Title</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ArtistID</dt>
+            <dd class="col-sm-10">@albums.ArtistID</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">GenreID</dt>
+            <dd class="col-sm-10">@albums.GenreID</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CreatedAt</dt>
+            <dd class="col-sm-10">@albums.CreatedAt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">UpdatedAt</dt>
+            <dd class="col-sm-10">@albums.UpdatedAt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Createdby</dt>
+            <dd class="col-sm-10">@albums.Createdby</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@albums.UpdatedBy</dd>
+        </dl>
+        <EditForm method="post" Model="albums" OnValidSubmit="DeleteAlbums" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(albums is null)">Delete</button> |
+            <a href="/albums">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Albums? albums;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        albums = await context.Albums.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (albums is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteAlbums()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Albums.Remove(albums!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/albums");
+    }
+}

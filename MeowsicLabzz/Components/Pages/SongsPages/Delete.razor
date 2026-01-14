@@ -1,0 +1,83 @@
+﻿@page "/songs/delete"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.MeowsicLabzzContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>Songs</h2>
+    <hr />
+    @if (songs is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@songs.Title</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Duration</dt>
+            <dd class="col-sm-10">@songs.Duration</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ArtistID</dt>
+            <dd class="col-sm-10">@songs.ArtistID</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">AlbumsID</dt>
+            <dd class="col-sm-10">@songs.AlbumsID</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">CreatedAt</dt>
+            <dd class="col-sm-10">@songs.CreatedAt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">UpdatedAt</dt>
+            <dd class="col-sm-10">@songs.UpdatedAt</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Createdby</dt>
+            <dd class="col-sm-10">@songs.Createdby</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@songs.UpdatedBy</dd>
+        </dl>
+        <EditForm method="post" Model="songs" OnValidSubmit="DeleteSongs" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(songs is null)">Delete</button> |
+            <a href="/songs">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private Songs? songs;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        songs = await context.Songs.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (songs is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteSongs()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Songs.Remove(songs!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/songs");
+    }
+}

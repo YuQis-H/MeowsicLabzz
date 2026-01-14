@@ -1,0 +1,42 @@
+﻿@page "/albums"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MeowsicLabzz.Components.Domain
+@using MeowsicLabzz.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MeowsicLabzz.Data.MeowsicLabzzContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="albums/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Albums">
+    <PropertyColumn Property="albums => albums.Title" />
+    <PropertyColumn Property="albums => albums.ArtistID" />
+    <PropertyColumn Property="albums => albums.GenreID" />
+    <PropertyColumn Property="albums => albums.CreatedAt" />
+    <PropertyColumn Property="albums => albums.UpdatedAt" />
+    <PropertyColumn Property="albums => albums.Createdby" />
+    <PropertyColumn Property="albums => albums.UpdatedBy" />
+
+    <TemplateColumn Context="albums">
+        <a href="@($"albums/edit?id={albums.Id}")">Edit</a> |
+        <a href="@($"albums/details?id={albums.Id}")">Details</a> |
+        <a href="@($"albums/delete?id={albums.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private MeowsicLabzzContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

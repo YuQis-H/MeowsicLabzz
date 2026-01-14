@@ -1,0 +1,79 @@
+﻿@page "/songs/create"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.MeowsicLabzzContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Songs</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Songs" OnValidSubmit="AddSongs" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="title" class="form-label">Title:</label> 
+                <InputText id="title" @bind-Value="Songs.Title" class="form-control" /> 
+                <ValidationMessage For="() => Songs.Title" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="duration" class="form-label">Duration:</label> 
+                <InputNumber TValue="int?" id="duration" @bind-Value="Songs.Duration" class="form-control" /> 
+                <ValidationMessage For="() => Songs.Duration" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="artistid" class="form-label">ArtistID:</label> 
+                <InputNumber id="artistid" @bind-Value="Songs.ArtistID" class="form-control" /> 
+                <ValidationMessage For="() => Songs.ArtistID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="albumsid" class="form-label">AlbumsID:</label> 
+                <InputNumber id="albumsid" @bind-Value="Songs.AlbumsID" class="form-control" /> 
+                <ValidationMessage For="() => Songs.AlbumsID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdat" class="form-label">CreatedAt:</label> 
+                <InputDate TValue="DateTime" id="createdat" @bind-Value="Songs.CreatedAt" class="form-control" /> 
+                <ValidationMessage For="() => Songs.CreatedAt" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedat" class="form-label">UpdatedAt:</label> 
+                <InputDate TValue="DateTime" id="updatedat" @bind-Value="Songs.UpdatedAt" class="form-control" /> 
+                <ValidationMessage For="() => Songs.UpdatedAt" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">Createdby:</label> 
+                <InputText id="createdby" @bind-Value="Songs.Createdby" class="form-control" /> 
+                <ValidationMessage For="() => Songs.Createdby" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">UpdatedBy:</label> 
+                <InputText id="updatedby" @bind-Value="Songs.UpdatedBy" class="form-control" /> 
+                <ValidationMessage For="() => Songs.UpdatedBy" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/songs">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Songs Songs { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddSongs()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Songs.Add(Songs);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/songs");
+    }
+}

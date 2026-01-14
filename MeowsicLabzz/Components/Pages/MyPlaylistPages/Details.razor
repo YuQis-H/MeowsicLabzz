@@ -1,0 +1,58 @@
+﻿@page "/myplaylists/details"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.MeowsicLabzzContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>MyPlaylist</h2>
+    <hr />
+    @if (myplaylist is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@myplaylist.Name</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@myplaylist.Description</dd>
+            <dt class="col-sm-2">UserID</dt>
+            <dd class="col-sm-10">@myplaylist.UserID</dd>
+            <dt class="col-sm-2">CreatedAt</dt>
+            <dd class="col-sm-10">@myplaylist.CreatedAt</dd>
+            <dt class="col-sm-2">UpdatedAt</dt>
+            <dd class="col-sm-10">@myplaylist.UpdatedAt</dd>
+            <dt class="col-sm-2">Createdby</dt>
+            <dd class="col-sm-10">@myplaylist.Createdby</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@myplaylist.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/myplaylists/edit?id={myplaylist.Id}")">Edit</a> |
+            <a href="@($"/myplaylists")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private MyPlaylist? myplaylist;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        myplaylist = await context.MyPlaylist.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (myplaylist is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

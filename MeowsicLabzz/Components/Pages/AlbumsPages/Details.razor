@@ -1,0 +1,58 @@
+﻿@page "/albums/details"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.MeowsicLabzzContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Albums</h2>
+    <hr />
+    @if (albums is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Title</dt>
+            <dd class="col-sm-10">@albums.Title</dd>
+            <dt class="col-sm-2">ArtistID</dt>
+            <dd class="col-sm-10">@albums.ArtistID</dd>
+            <dt class="col-sm-2">GenreID</dt>
+            <dd class="col-sm-10">@albums.GenreID</dd>
+            <dt class="col-sm-2">CreatedAt</dt>
+            <dd class="col-sm-10">@albums.CreatedAt</dd>
+            <dt class="col-sm-2">UpdatedAt</dt>
+            <dd class="col-sm-10">@albums.UpdatedAt</dd>
+            <dt class="col-sm-2">Createdby</dt>
+            <dd class="col-sm-10">@albums.Createdby</dd>
+            <dt class="col-sm-2">UpdatedBy</dt>
+            <dd class="col-sm-10">@albums.UpdatedBy</dd>
+        </dl>
+        <div>
+            <a href="@($"/albums/edit?id={albums.Id}")">Edit</a> |
+            <a href="@($"/albums")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Albums? albums;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        albums = await context.Albums.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (albums is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,114 @@
+﻿@page "/recommendations/edit"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.MeowsicLabzzContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Recommendations</h2>
+<hr />
+@if (Recommendations is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Recommendations" OnValidSubmit="UpdateRecommendations" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Recommendations.Id" value="@Recommendations.Id" />
+                <div class="mb-3">
+                    <label for="userid" class="form-label">UsersId:</label>
+                    <InputNumber id="userid" @bind-Value="Recommendations.UsersId" class="form-control" />
+                    <ValidationMessage For="() => Recommendations.UsersId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="songid" class="form-label">SongId:</label>
+                    <InputNumber id="songid" @bind-Value="Recommendations.SongId" class="form-control" />
+                    <ValidationMessage For="() => Recommendations.SongId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdat" class="form-label">CreatedAt:</label>
+                    <InputDate id="createdat" @bind-Value="Recommendations.CreatedAt" class="form-control" />
+                    <ValidationMessage For="() => Recommendations.CreatedAt" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedat" class="form-label">UpdatedAt:</label>
+                    <InputDate id="updatedat" @bind-Value="Recommendations.UpdatedAt" class="form-control" />
+                    <ValidationMessage For="() => Recommendations.UpdatedAt" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">Createdby:</label>
+                    <InputText id="createdby" @bind-Value="Recommendations.Createdby" class="form-control" />
+                    <ValidationMessage For="() => Recommendations.Createdby" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">UpdatedBy:</label>
+                    <InputText id="updatedby" @bind-Value="Recommendations.UpdatedBy" class="form-control" />
+                    <ValidationMessage For="() => Recommendations.UpdatedBy" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/recommendations">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Recommendations? Recommendations { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Recommendations ??= await context.Recommendations.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Recommendations is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateRecommendations()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Recommendations!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RecommendationsExists(Recommendations!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/recommendations");
+    }
+
+    private bool RecommendationsExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Recommendations.Any(e => e.Id == id);
+    }
+}

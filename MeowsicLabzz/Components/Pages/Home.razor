@@ -1,7 +1,15 @@
-﻿@page "/"
+﻿
+@page "/"
 
 <PageTitle>Home</PageTitle>
 
-<h1>Welcome,User!</h1>
+<AuthorizeView>
+    <Authorized Context="auth">
+        <h1>Welcome Home, @auth.User.Identity?.Name!</h1>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Welcome, User!</h1>
+    </NotAuthorized>
+</AuthorizeView>
 
-What's your vibe today?~
+<p>What's your vibe today? ᯓ𝄞</p>
