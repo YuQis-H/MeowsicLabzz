@@ -1,0 +1,17 @@
+﻿@page "/admin/albums"
+
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Administrator")]
+@inject NavigationManager NavigationManager
+
+<h3>Albums</h3>
+<button type="button" class="btn btn-secondary mb-3" @onclick="GoBack">← Back to Admin</button>
+
+<h5>Albums are saved here.</h5>
+
+@code {
+ private void GoBack()
+ {
+ NavigationManager.NavigateTo("/admin");
+ }
+}

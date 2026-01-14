@@ -1,25 +1,25 @@
-﻿@page "/admin/moods"
+﻿@page "/admin/artists"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @attribute [Authorize(Roles = "Administrator")]
 @inject MeowsicLabzz.Data.ApplicationDbContext Db
 @inject NavigationManager NavigationManager
 
-<h3>🎭 Manage Moods</h3>
+<h3>🎤 Manage Artists</h3>
 <button type="button" class="btn btn-secondary mb-3" @onclick="GoBack">← Back to Admin</button>
 
 <div class="mb-3">
- <input class="form-control" placeholder="New mood name" @bind="newName" />
- <button class="btn btn-primary mt-2" @onclick="AddMood">Add Mood</button>
+ <input class="form-control" placeholder="New artist name" @bind="newName" />
+ <button class="btn btn-primary mt-2" @onclick="AddArtist">Add Artist</button>
 </div>
 
-@if (moods is null)
+@if (artists is null)
 {
  <p><em>Loading...</em></p>
 }
-else if (!moods.Any())
+else if (!artists.Any())
 {
- <p>No moods found.</p>
+ <p>No artists found.</p>
 }
 else
 {
@@ -32,13 +32,13 @@ else
  </tr>
  </thead>
  <tbody>
- @foreach (var m in moods)
+ @foreach (var a in artists)
  {
  <tr>
- <td>@m.Id</td>
- <td>@m.Name</td>
+ <td>@a.Id</td>
+ <td>@a.Name</td>
  <td>
- <button class="btn btn-danger btn-sm" @onclick="() => DeleteMood(m.Id)">Delete</button>
+ <button class="btn btn-danger btn-sm" @onclick="() => DeleteArtist(a.Id)">Delete</button>
  </td>
  </tr>
  }
@@ -47,39 +47,39 @@ else
 }
 
 @code {
- private List<MeowsicLabzz.Components.Domain.Mood>? moods;
+ private List<MeowsicLabzz.Components.Domain.Artist>? artists;
  private string? newName;
 
  protected override async Task OnInitializedAsync()
  {
- await LoadMoods();
+ await LoadArtists();
  }
 
- private async Task LoadMoods()
+ private async Task LoadArtists()
  {
- moods = await Db.Moods.OrderBy(m => m.Id).ToListAsync();
+ artists = await Db.Artists.OrderBy(a => a.Id).ToListAsync();
  StateHasChanged();
  }
 
- private async Task AddMood()
+ private async Task AddArtist()
  {
  if (string.IsNullOrWhiteSpace(newName))
  return;
 
- var mood = new MeowsicLabzz.Components.Domain.Mood { Name = newName.Trim() };
- Db.Moods.Add(mood);
+ var artist = new MeowsicLabzz.Components.Domain.Artist { Name = newName.Trim() };
+ Db.Artists.Add(artist);
  await Db.SaveChangesAsync();
  newName = string.Empty;
- await LoadMoods();
+ await LoadArtists();
  }
 
- private async Task DeleteMood(int id)
+ private async Task DeleteArtist(int id)
  {
- var entity = await Db.Moods.FindAsync(id);
+ var entity = await Db.Artists.FindAsync(id);
  if (entity is null) return;
- Db.Moods.Remove(entity);
+ Db.Artists.Remove(entity);
  await Db.SaveChangesAsync();
- await LoadMoods();
+ await LoadArtists();
  }
 
  private void GoBack()
