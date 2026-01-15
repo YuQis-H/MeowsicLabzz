@@ -28,6 +28,18 @@
         <ValidationSummary class="text-danger" role="alert" />
 
         <div class="mb-3">
+            <label class="form-label text-light">First name:</label>
+            <InputText @bind-Value="Input.FirstName" class="form-control input-white" autocomplete="given-name" />
+            <ValidationMessage For="() => Input.FirstName" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label text-light">Last name:</label>
+            <InputText @bind-Value="Input.LastName" class="form-control input-white" autocomplete="family-name" />
+            <ValidationMessage For="() => Input.LastName" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
             <label class="form-label text-light">Email:</label>
             <InputText @bind-Value="Input.Email" class="form-control input-white"
                        autocomplete="username" aria-required="true" />
@@ -70,6 +82,11 @@
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+        // Set first and last name on the user before creation
+        user.FirstName = string.IsNullOrWhiteSpace(Input.FirstName) ? null : Input.FirstName.Trim();
+        user.LastName = string.IsNullOrWhiteSpace(Input.LastName) ? null : Input.LastName.Trim();
+
         var result = await UserManager.CreateAsync(user, Input.Password);
 
         if (!result.Succeeded)
@@ -124,13 +141,19 @@
 
     private sealed class InputModel
     {
+        [Display(Name = "First name")]
+        public string? FirstName { get; set; }
+
+        [Display(Name = "Last name")]
+        public string? LastName { get; set; }
+
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; } = "";
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength =6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; } = "";
