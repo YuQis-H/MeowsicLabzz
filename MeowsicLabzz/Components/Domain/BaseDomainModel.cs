@@ -2,10 +2,36 @@
 {
     public abstract class BaseDomainModel
     {
-        public int Id { get; set; } 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public string? Createdby { get; set; }
-        public string? UpdatedBy { get; set; }
+        // Primary key for all domain entities
+        public int Id { get; set; }
+    }
+
+    public class Mood : BaseDomainModel
+    {
+        public string? Name { get; set; }
+    }
+
+    public class Genre : BaseDomainModel
+    {
+        public string? Name { get; set; }
+    }
+
+    public class Artist : BaseDomainModel
+    {
+        public string? Name { get; set; }
+    }
+
+    public class Song : BaseDomainModel
+    {
+        public string? Title { get; set; }
+        public int ArtistId { get; set; }
+        public int GenreId { get; set; }
+        public int AlbumId { get; set; }
+    }
+
+    public class Album : BaseDomainModel
+    {
+        public string? Title { get; set; }
+        public int ArtistId { get; set; }
     }
 }
