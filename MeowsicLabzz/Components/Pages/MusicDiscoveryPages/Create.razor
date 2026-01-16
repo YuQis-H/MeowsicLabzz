@@ -1,0 +1,49 @@
+﻿@page "/musicdiscoveries/create"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>MusicDiscovery</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="MusicDiscovery" OnValidSubmit="AddMusicDiscovery" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserId:</label> 
+                <InputNumber id="userid" @bind-Value="MusicDiscovery.UserId" class="form-control" /> 
+                <ValidationMessage For="() => MusicDiscovery.UserId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="songid" class="form-label">SongId:</label> 
+                <InputNumber id="songid" @bind-Value="MusicDiscovery.SongId" class="form-control" /> 
+                <ValidationMessage For="() => MusicDiscovery.SongId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/musicdiscoveries">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private MusicDiscovery MusicDiscovery { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddMusicDiscovery()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.MusicDiscovery.Add(MusicDiscovery);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/musicdiscoveries");
+    }
+}

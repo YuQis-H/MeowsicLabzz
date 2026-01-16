@@ -1,0 +1,54 @@
+﻿@page "/myplaylists/create"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>MyPlaylist</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="MyPlaylist" OnValidSubmit="AddMyPlaylist" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="MyPlaylist.Name" class="form-control" /> 
+                <ValidationMessage For="() => MyPlaylist.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="MyPlaylist.Description" class="form-control" /> 
+                <ValidationMessage For="() => MyPlaylist.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserID:</label> 
+                <InputNumber id="userid" @bind-Value="MyPlaylist.UserID" class="form-control" /> 
+                <ValidationMessage For="() => MyPlaylist.UserID" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/myplaylists">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private MyPlaylist MyPlaylist { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddMyPlaylist()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.MyPlaylist.Add(MyPlaylist);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/myplaylists");
+    }
+}

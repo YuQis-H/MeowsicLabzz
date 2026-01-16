@@ -1,0 +1,49 @@
+﻿@page "/friends/create"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Friends</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Friends" OnValidSubmit="AddFriends" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Friends.Name" class="form-control" /> 
+                <ValidationMessage For="() => Friends.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="userid" class="form-label">UserID:</label> 
+                <InputNumber id="userid" @bind-Value="Friends.UserID" class="form-control" /> 
+                <ValidationMessage For="() => Friends.UserID" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/friends">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Friends Friends { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddFriends()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Friends.Add(Friends);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/friends");
+    }
+}

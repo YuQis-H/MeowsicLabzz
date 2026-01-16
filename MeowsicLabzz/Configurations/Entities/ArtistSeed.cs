@@ -7,11 +7,27 @@ namespace MeowsicLabzz.Configurations.Entities
 	public class ArtistSeed : IEntityTypeConfiguration<Artist>
 	{
 		public void Configure(EntityTypeBuilder<Artist> builder)
-		{
+		{   
+			var now = DateTime.Now.ToString("o"); // Use ISO 8601 string format
 			builder.HasData(
-				new Artist { Id =1, Name = "Billie Eilish" },
-				new Artist { Id =2, Name = "Stray Kids" },
-				new Artist { Id =3, Name = "Ariana Grande" }
+				new Artist { Id =1, Name = "Billie Eilish",
+					CreatedAt =     now,
+                    UpdatedAt = now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                },
+				new Artist { Id =2, Name = "Stray Kids",
+                    CreatedAt = now,
+                    UpdatedAt = now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                },
+				new Artist { Id =3, Name = "Ariana Grande",
+                    CreatedAt = now,
+                    UpdatedAt = now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                }
 			);
 		}
 	}

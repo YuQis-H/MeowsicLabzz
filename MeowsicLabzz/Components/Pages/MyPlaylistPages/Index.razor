@@ -1,0 +1,38 @@
+﻿@page "/myplaylists"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MeowsicLabzz.Components.Domain
+@using MeowsicLabzz.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="myplaylists/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.MyPlaylist">
+    <PropertyColumn Property="myplaylist => myplaylist.Name" />
+    <PropertyColumn Property="myplaylist => myplaylist.Description" />
+    <PropertyColumn Property="myplaylist => myplaylist.UserID" />
+
+    <TemplateColumn Context="myplaylist">
+        <a href="@($"myplaylists/edit?id={myplaylist.Id}")">Edit</a> |
+        <a href="@($"myplaylists/details?id={myplaylist.Id}")">Details</a> |
+        <a href="@($"myplaylists/delete?id={myplaylist.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -8,10 +8,26 @@ namespace MeowsicLabzz.Configurations.Entities
 	{
 		public void Configure(EntityTypeBuilder<Album> builder)
 		{
+			var now = DateTime.Now.ToString("O");
 			builder.HasData(
-				new Album { Id =1, Title = "Happier Than Ever", ArtistId =1 },
-				new Album { Id =2, Title = "ODDINARY", ArtistId =2 },
-				new Album { Id =3, Title = "Positions", ArtistId =3 }
+				new Album { Id =1, Title = "Happier Than Ever", ArtistId =1, GenreId = 1,
+                    CreatedAt = now,
+                    UpdatedAt = now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                },
+				new Album { Id =2, Title = "ODDINARY", ArtistId =2, GenreId = 1,
+                    CreatedAt = now,
+                    UpdatedAt = now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                },
+				new Album { Id =3, Title = "Positions", ArtistId =3, GenreId = 1,
+                    CreatedAt = now,
+                    UpdatedAt = now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                }
 			);
 		}
 	}

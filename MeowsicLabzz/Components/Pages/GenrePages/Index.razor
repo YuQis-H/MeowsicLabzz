@@ -1,0 +1,37 @@
+﻿@page "/genres"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MeowsicLabzz.Components.Domain
+@using MeowsicLabzz.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="genres/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Genres">
+    <PropertyColumn Property="genre => genre.Name" />
+    <PropertyColumn Property="genre => genre.Description" />
+
+    <TemplateColumn Context="genre">
+        <a href="@($"genres/edit?id={genre.Id}")">Edit</a> |
+        <a href="@($"genres/details?id={genre.Id}")">Details</a> |
+        <a href="@($"genres/delete?id={genre.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

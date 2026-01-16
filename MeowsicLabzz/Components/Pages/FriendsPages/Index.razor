@@ -1,0 +1,37 @@
+﻿@page "/friends"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MeowsicLabzz.Components.Domain
+@using MeowsicLabzz.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="friends/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Friends">
+    <PropertyColumn Property="friends => friends.Name" />
+    <PropertyColumn Property="friends => friends.UserID" />
+
+    <TemplateColumn Context="friends">
+        <a href="@($"friends/edit?id={friends.Id}")">Edit</a> |
+        <a href="@($"friends/details?id={friends.Id}")">Details</a> |
+        <a href="@($"friends/delete?id={friends.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
