@@ -1,4 +1,113 @@
 ﻿@page "/musicdiscovery"
 
-<h2>Music Discovery</h2>
-<p>Explore trending tracks based on your mood here!</p>
+<header class="md-header" role="banner" aria-label="Music discovery header">
+    <div class="md-header-inner">
+        <div class="md-icon" aria-hidden="true">
+            <!-- simple music note icon that follows currentColor -->
+            <svg viewBox="0 0 24 24" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+                <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z" fill="currentColor"/>
+            </svg>
+        </div>
+
+        <div class="md-titles">
+            <h1 class="md-title">Music Discovery</h1>
+            <p class="md-subtitle">Explore trending tracks tailored to your mood.</p>
+        </div>
+
+        <div class="md-cta" aria-hidden="true">
+            <span class="md-tag">New</span>
+        </div>
+    </div>
+</header>
+
+<main class="md-content">
+    <section>
+        <p>Explore trending tracks based on your mood here!</p>
+    </section>
+</main>
+
+<style>
+/* Header: full-width banner with adjustable gradient and accessible layout */
+.md-header {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1.25rem 1.5rem;
+    background: var(--md-header-bg, linear-gradient(90deg, #7C4DFF 0%, #FF6B94 100%));
+    color: var(--md-header-color, #ffffff);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.md-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* icon container keeps background transparent so no yellow box */
+.md-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    color: var(--md-icon-color, #fff);
+    flex: 0 0 auto;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* titles take the remaining space */
+.md-titles {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.md-title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: inherit;
+}
+
+.md-subtitle {
+    margin: 0;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.9);
+}
+
+/* small CTA / tag on the right */
+.md-cta {
+    flex: 0 0 auto;
+}
+.md-tag {
+    display:inline-block;
+    padding: .25rem .6rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    color: var(--md-tag-color, #fff);
+    font-weight: 600;
+    font-size: .8rem;
+}
+
+/* content area */
+.md-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* Responsive tweaks */
+
+    .md-header {
+        padding: 1rem;
+    }
+    .md-icon { width:52px; height:52px; }
+    .md-title { font-size: 1.25rem; }
+    .md-subtitle { font-size: .9rem; }
+}
+</style>

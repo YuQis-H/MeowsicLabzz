@@ -9,7 +9,7 @@ namespace MeowsicLabzz.Configurations.Entities
         public void Configure(EntityTypeBuilder<Friends> builder)
         {
             builder.HasData(
-                new Friends { Id = 1, Name = "Chee Peng" },
+                new Friends { Id = 1, Name = "Chee Peng"},
                 new Friends { Id = 2, Name = "Ding Tan" }
             );
         }

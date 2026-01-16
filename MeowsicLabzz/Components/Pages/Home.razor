@@ -31,6 +31,82 @@
     }
 }
 
-<h1>Welcome, @displayName!</h1>
+<header class="welcome-header">
+    <span class="header-icon" aria-hidden="true">^. .^₎Ⳋ</span>
+    <div class="welcome-text">
+        <h1 class="mb-0">Welcome, @displayName!</h1>
+        <h2 class="h5 text-muted mb-1">Nice to see mew — let’s discover music together.</h2>
+        <h3 class="h6 text-secondary mb-0">What's your vibe today?</h3>
+    </div>
+</header>
 
-What's your vibe today?~
+<section class="vibe-section mt-3">
+    <p class="text-muted small mb-2">Choose a mood and get tuned suggestions.</p>
+
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-primary btn-sm">Chill</button>
+        <button class="btn btn-outline-success btn-sm">Focus</button>
+        <button class="btn btn-outline-warning btn-sm">Party</button>
+        <button class="btn btn-dark btn-sm">Study</button>
+    </div>
+</section>
+
+<style>
+    /* make the header span the page and feel longer */
+    .welcome-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+        width: 100%;
+        padding: 1.25rem 2rem; /* longer header */
+        box-sizing: border-box;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+        background: transparent; /* no yellow box */
+    }
+
+    /* remove yellow background and use a subtle purple outline so icon stands out */
+    .header-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        font-size: 26px;
+        background: transparent; /* removed yellow box */
+        color: var(--header-icon-color, #6A1B9A);
+        border: 2px solid var(--header-icon-stroke, #7C4DFF);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    .welcome-text { flex: 1; }
+
+    .welcome-text h1 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.6rem;
+    }
+
+    .welcome-text h2 {
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .welcome-text h3 {
+        margin: 0;
+        font-weight: 400;
+        color: rgba(0,0,0,0.54);
+    }
+
+    /* Make Study more prominent if Bootstrap not used or to reinforce contrast */
+    .btn-dark {
+        background-color: var(--study-btn-bg, #343a40);
+        border-color: var(--study-btn-bg, #343a40);
+        color: #fff;
+    }
+
+    .vibe-section .btn {
+        min-width: 86px;
+    }
+</style>

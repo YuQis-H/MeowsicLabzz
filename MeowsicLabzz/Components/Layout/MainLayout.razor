@@ -6,15 +6,16 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
+           <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+<!-- About link moved to bottom with pill + white border -->
+<footer class="bottom-row px-4">
+    <a class="about-pill" href="https://learn.microsoft.com/aspnet/core/" target="_blank" rel="noopener">About</a>
+</footer>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
