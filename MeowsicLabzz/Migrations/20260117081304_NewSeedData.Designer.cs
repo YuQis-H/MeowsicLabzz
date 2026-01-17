@@ -4,6 +4,7 @@ using MeowsicLabzz.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MeowsicLabzz.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class IdentityContextModelSnapshot : ModelSnapshot
+    [Migration("20260117081304_NewSeedData")]
+    partial class NewSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,58 +63,34 @@ namespace MeowsicLabzz.Migrations
                         {
                             Id = 1,
                             ArtistId = 1,
-<<<<<<< HEAD
-<<<<<<< HEAD
                             CreatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9162),
                             CreatedBy = "System",
                             GenreId = 1,
                             Title = "Happier Than Ever",
                             UpdatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9163),
                             UpdatedBy = "System"
-=======
-=======
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
-                            GenreId = 1,
-                            Title = "Happier Than Ever"
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
                         },
                         new
                         {
                             Id = 2,
                             ArtistId = 2,
-<<<<<<< HEAD
-<<<<<<< HEAD
                             CreatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9164),
                             CreatedBy = "System",
                             GenreId = 1,
                             Title = "ODDINARY",
                             UpdatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9165),
                             UpdatedBy = "System"
-=======
-=======
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
-                            GenreId = 1,
-                            Title = "ODDINARY"
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
                         },
                         new
                         {
                             Id = 3,
                             ArtistId = 3,
-<<<<<<< HEAD
-<<<<<<< HEAD
                             CreatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9166),
                             CreatedBy = "System",
                             GenreId = 1,
                             Title = "Positions",
                             UpdatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9167),
                             UpdatedBy = "System"
-=======
-=======
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
-                            GenreId = 1,
-                            Title = "Positions"
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
                         });
                 });
 
@@ -123,18 +102,10 @@ namespace MeowsicLabzz.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-<<<<<<< HEAD
-<<<<<<< HEAD
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedBy")
-=======
-                    b.Property<string>("ArtistType")
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
-=======
-                    b.Property<string>("ArtistType")
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Gender")
@@ -157,56 +128,29 @@ namespace MeowsicLabzz.Migrations
                         new
                         {
                             Id = 1,
-<<<<<<< HEAD
-<<<<<<< HEAD
                             CreatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9029),
                             CreatedBy = "System",
                             Name = "Billie Eilish",
                             UpdatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9029),
                             UpdatedBy = "System"
-=======
-=======
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
-                            ArtistType = "Soloist",
-                            Gender = "Female",
-                            Name = "Billie Eilish"
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
                         },
                         new
                         {
                             Id = 2,
-<<<<<<< HEAD
-<<<<<<< HEAD
                             CreatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9031),
                             CreatedBy = "System",
                             Name = "Stray Kids",
                             UpdatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9031),
                             UpdatedBy = "System"
-=======
-=======
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
-                            ArtistType = "Group",
-                            Gender = "Mixed",
-                            Name = "Stray Kids"
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
                         },
                         new
                         {
                             Id = 3,
-<<<<<<< HEAD
-<<<<<<< HEAD
                             CreatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9033),
                             CreatedBy = "System",
                             Name = "Ariana Grande",
                             UpdatedAt = new DateTime(2026, 1, 17, 16, 13, 3, 670, DateTimeKind.Local).AddTicks(9033),
                             UpdatedBy = "System"
-=======
-=======
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
-                            ArtistType = "Soloist",
-                            Gender = "Female",
-                            Name = "Ariana Grande"
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
                         });
                 });
 
@@ -729,15 +673,7 @@ namespace MeowsicLabzz.Migrations
                         {
                             Id = "3781efa7-66dc-47f0-860f-e506d04102e4",
                             AccessFailedCount = 0,
-<<<<<<< HEAD
-<<<<<<< HEAD
                             ConcurrencyStamp = "43a2118e-d407-47a0-853b-ac3a9701e15e",
-=======
-                            ConcurrencyStamp = "f8bc9356-ca40-4997-9ae0-ae54ab6a6b66",
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
-=======
-                            ConcurrencyStamp = "f8bc9356-ca40-4997-9ae0-ae54ab6a6b66",
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
                             Email = "admin@localhost.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -745,21 +681,9 @@ namespace MeowsicLabzz.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@LOCALHOST.COM",
                             NormalizedUserName = "ADMIN@LOCALHOST.COM",
-<<<<<<< HEAD
-<<<<<<< HEAD
                             PasswordHash = "AQAAAAIAAYagAAAAEHajF87Bs4lVc2bzZm1oI0w5Ofexaz7snF2HJ9AUSIe106zw+PfeaoS885eEy5TZVQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "45b54756-9d46-4ff5-97b4-fcc61bc679b5",
-=======
-                            PasswordHash = "AQAAAAIAAYagAAAAELfmwk5ENcWn/XU8tRHWF2PJV02A9p+VfEBCMXOZ8XF6xBqDmjzn5NLdpFDR2r0qkg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "6fdae967-1e2e-479a-8314-27d16792c991",
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
-=======
-                            PasswordHash = "AQAAAAIAAYagAAAAELfmwk5ENcWn/XU8tRHWF2PJV02A9p+VfEBCMXOZ8XF6xBqDmjzn5NLdpFDR2r0qkg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "6fdae967-1e2e-479a-8314-27d16792c991",
->>>>>>> ca9159786092059d25642f95297f4b8c6c4fd137
                             TwoFactorEnabled = false,
                             UserName = "admin@localhost.com"
                         });

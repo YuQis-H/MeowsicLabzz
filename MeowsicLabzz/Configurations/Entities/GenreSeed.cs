@@ -9,10 +9,38 @@ namespace MeowsicLabzz.Configurations.Entities
 		public void Configure(EntityTypeBuilder<Genre> builder)
 		{
 			builder.HasData(
-				new Genre { Id =1, Name = "Pop",},
-				new Genre { Id =2, Name = "Rock" },
-				new Genre { Id =3, Name = "Jazz" },
-				new Genre { Id =4, Name = "Classical" }
+				new Genre { 
+                    Id =1,
+					Name = "Pop",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                },
+				new Genre { 
+                    Id =2, 
+					Name = "Rock",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                },
+				new Genre { 
+                    Id =3, 
+                    Name = "Jazz",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                },
+				new Genre { 
+                    Id =4, 
+                    Name = "Classical",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    CreatedBy = "System",
+                    UpdatedBy = "System"
+                }
 			);
 		}
 	}
