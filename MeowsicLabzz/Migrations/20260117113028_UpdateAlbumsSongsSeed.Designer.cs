@@ -4,6 +4,7 @@ using MeowsicLabzz.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MeowsicLabzz.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class IdentityContextModelSnapshot : ModelSnapshot
+    [Migration("20260117113028_UpdateAlbumsSongsSeed")]
+    partial class UpdateAlbumsSongsSeed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,13 +74,6 @@ namespace MeowsicLabzz.Migrations
                             ArtistId = 1,
                             GenreId = 1,
                             Title = "When We All Fall Asleep, Where Do We Go?"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ArtistId = 2,
-                            GenreId = 1,
-                            Title = "Go Live"
                         });
                 });
 
@@ -317,7 +313,7 @@ namespace MeowsicLabzz.Migrations
                         new
                         {
                             Id = 4,
-                            AlbumId = 5,
+                            AlbumId = 2,
                             ArtistId = 2,
                             Duration = 0,
                             GenreId = 1,
@@ -443,7 +439,7 @@ namespace MeowsicLabzz.Migrations
                         {
                             Id = "3781efa7-66dc-47f0-860f-e506d04102e4",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "df38d0d7-17f1-420e-b053-2f42bbc06393",
+                            ConcurrencyStamp = "90421783-e589-44ab-b2a8-9b5166d3b2d9",
                             Email = "admin@localhost.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -451,9 +447,9 @@ namespace MeowsicLabzz.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@LOCALHOST.COM",
                             NormalizedUserName = "ADMIN@LOCALHOST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAJTwtN/+FQz0H8xOB7/NpLwe9W8GePqnNU7ufu6NhAJuzyhtQgYtVQRphKPZ/yN0w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN5crhg90sXa7uE4sGDIW46rYWnvXlPTGv3J1IAS0HgpAOPKsxNeaADg7ax/dlChog==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a11cc374-bb85-4a74-85b1-cc63e75258f3",
+                            SecurityStamp = "80fc39bd-7ad6-4031-b167-3d2ef1389e93",
                             TwoFactorEnabled = false,
                             UserName = "admin@localhost.com"
                         });
