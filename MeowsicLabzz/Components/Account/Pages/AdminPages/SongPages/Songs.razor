@@ -1,0 +1,51 @@
+﻿@page "/admin/songs"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<h3>🎵 Manage Songs</h3>
+<NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
+<NavLink class="btn btn-primary mb-3 ms-2" href="/admin/songs/create">Create New Song</NavLink>
+
+@if (Db.Songs is null)
+{
+ <p><em>Loading...</em></p>
+}
+else
+{
+ <QuickGrid Class="table" Items="Db.Songs">
+ <PropertyColumn Property="s => s.Id" />
+ <PropertyColumn Property="s => s.Title" />
+ <TemplateColumn Context="s">
+ @(
+ Db.Artists.Where(a => a.Id == s.ArtistId).Select(a => a.Name).FirstOrDefault()
+ )
+ </TemplateColumn>
+ <TemplateColumn Context="s">
+ @(
+ Db.Albums.Where(al => al.Id == s.AlbumId).Select(al => al.Title).FirstOrDefault()
+ )
+ </TemplateColumn>
+ <!-- Duration column: format seconds as m:ss or h:mm:ss -->
+ <TemplateColumn Context="s">
+ @((TimeSpan.FromSeconds(s.Duration)).ToString(s.Duration >=3600 ? "h\\:mm\\:ss" : "m\\:ss"))
+ </TemplateColumn>
+ <TemplateColumn Context="s">
+ @(
+ Db.Genres.Where(g => g.Id == s.GenreId).Select(g => g.Name).FirstOrDefault()
+ )
+ </TemplateColumn>
+ <TemplateColumn Context="s">
+ <a class="me-2" href="@($"/admin/songs/edit?id={s.Id}")">Edit</a>
+ <a class="me-2" href="@($"/admin/songs/delete?id={s.Id}")">Delete</a>
+ </TemplateColumn>
+ </QuickGrid>
+}
+
+@code {
+ private void GoBack() => NavigationManager.NavigateTo("/admin");
+}

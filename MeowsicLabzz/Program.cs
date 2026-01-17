@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("IdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
 
+// Register a DbContextFactory for use in Blazor components (register before AddDbContext)
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddQuickGridEntityFrameworkAdapter();
@@ -78,7 +81,7 @@ if (!app.Environment.IsDevelopment())
  app.UseExceptionHandler("/Error", createScopeForErrors: true);
  // The default HSTS value is30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
  app.UseHsts();
-    app.UseMigrationsEndPoint();
+ app.UseMigrationsEndPoint();
 }
 
 app.UseHttpsRedirection();

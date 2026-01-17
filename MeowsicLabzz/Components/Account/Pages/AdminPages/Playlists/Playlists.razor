@@ -1,0 +1,161 @@
+@page "/admin/playlists"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<h3>?? Auto Playlists</h3>
+<NavLink class="btn btn-secondary mb-3" href="/admin">? Back to Admin</NavLink>
+
+@if (allSongs is null)
+{
+ <p><em>Loading...</em></p>
+}
+else
+{
+ <div class="row g-4">
+ <div class="col-md-4">
+ <div class="card p-3 bg-purple h-100">
+ <h5>Featured — Top Songs</h5>
+ <p class="text-muted small">First songs in the library</p>
+ <ol class="list-group list-group-flush">
+ @foreach (var s in featured)
+ {
+ <li class="list-group-item bg-transparent border-0 px-0 py-2">
+ <div class="d-flex justify-content-between">
+ <div>
+ <strong>@s.Title</strong>
+ <div class="small text-muted">@s.ArtistName — @s.AlbumTitle</div>
+ </div>
+ <div class="small text-muted">@FormatDuration(s.Duration)</div>
+ </div>
+ </li>
+ }
+ </ol>
+ </div>
+ </div>
+
+ <div class="col-md-4">
+ <div class="card p-3 bg-purple h-100">
+ <h5>Album Picks</h5>
+ <p class="text-muted small">One highlight track per album</p>
+ <ol class="list-group list-group-flush">
+ @foreach (var s in albumPicks)
+ {
+ <li class="list-group-item bg-transparent border-0 px-0 py-2">
+ <div class="d-flex justify-content-between">
+ <div>
+ <strong>@s.Title</strong>
+ <div class="small text-muted">@s.ArtistName — @s.AlbumTitle</div>
+ </div>
+ <div class="small text-muted">@FormatDuration(s.Duration)</div>
+ </div>
+ </li>
+ }
+ </ol>
+ </div>
+ </div>
+
+ <div class="col-md-4">
+ <div class="card p-3 bg-purple h-100">
+ <h5>Artist Spotlight</h5>
+ <p class="text-muted small">Popular artists' tracks</p>
+ <ol class="list-group list-group-flush">
+ @foreach (var s in artistSpotlight)
+ {
+ <li class="list-group-item bg-transparent border-0 px-0 py-2">
+ <div class="d-flex justify-content-between">
+ <div>
+ <strong>@s.Title</strong>
+ <div class="small text-muted">@s.ArtistName — @s.AlbumTitle</div>
+ </div>
+ <div class="small text-muted">@FormatDuration(s.Duration)</div>
+ </div>
+ </li>
+ }
+ </ol>
+ </div>
+ </div>
+ </div>
+}
+
+@code {
+ private List<SongRow>? allSongs;
+ private List<SongRow> featured = new();
+ private List<SongRow> albumPicks = new();
+ private List<SongRow> artistSpotlight = new();
+
+ protected override async Task OnInitializedAsync()
+ {
+ await LoadSongs();
+ BuildPlaylists();
+ }
+
+ private async Task LoadSongs()
+ {
+ var temp = await Db.Songs
+ .Select(s => new
+ {
+ s.Id,
+ s.Title,
+ s.Duration,
+ ArtistName = Db.Artists.Where(a => a.Id == s.ArtistId).Select(a => a.Name).FirstOrDefault(),
+ AlbumTitle = Db.Albums.Where(al => al.Id == s.AlbumId).Select(al => al.Title).FirstOrDefault()
+ })
+ .OrderBy(s => s.Id)
+ .ToListAsync();
+
+ allSongs = temp.Select(x => new SongRow
+ {
+ Id = x.Id,
+ Title = x.Title ?? string.Empty,
+ Duration = x.Duration,
+ ArtistName = x.ArtistName ?? string.Empty,
+ AlbumTitle = x.AlbumTitle ?? string.Empty
+ }).ToList();
+ }
+
+ private void BuildPlaylists()
+ {
+ if (allSongs is null) return;
+
+ // Featured: first8 songs
+ featured = allSongs.Take(8).ToList();
+
+ // Album Picks: one song per album (first encountered), limit to8 albums
+ albumPicks = allSongs
+ .GroupBy(s => s.AlbumTitle)
+ .Select(g => g.First())
+ .Where(s => !string.IsNullOrEmpty(s.AlbumTitle))
+ .Take(8)
+ .ToList();
+
+ // Artist Spotlight: take songs from top3 artists (by count)
+ var topArtists = allSongs
+ .GroupBy(s => s.ArtistName)
+ .OrderByDescending(g => g.Count())
+ .Where(g => !string.IsNullOrEmpty(g.Key))
+ .Take(3)
+ .Select(g => g.Key)
+ .ToHashSet();
+
+ artistSpotlight = allSongs.Where(s => topArtists.Contains(s.ArtistName)).Take(12).ToList();
+ }
+
+ private string FormatDuration(int seconds)
+ {
+ var ts = TimeSpan.FromSeconds(seconds);
+ return seconds >=3600 ? ts.ToString(@"h\:mm\:ss") : ts.ToString(@"m\:ss");
+ }
+
+ private class SongRow
+ {
+ public int Id { get; set; }
+ public string Title { get; set; } = string.Empty;
+ public int Duration { get; set; }
+ public string ArtistName { get; set; } = string.Empty;
+ public string AlbumTitle { get; set; } = string.Empty;
+ }
+}

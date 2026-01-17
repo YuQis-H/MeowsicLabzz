@@ -1,0 +1,97 @@
+@page "/admin/songs/create"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using MeowsicLabzz.Data
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Song (Admin)</PageTitle>
+
+<h3>Create Song (Admin)</h3>
+
+<div class="card mb-3 p-3 bg-purple">
+ <EditForm method="post" Model="SongModel" OnValidSubmit="AddSong" FormName="create" Enhance>
+ <DataAnnotationsValidator />
+ <ValidationSummary class="text-danger" />
+
+ <div class="mb-3">
+ <label class="form-label">Id:</label>
+ <InputNumber class="form-control bg-light" @bind-Value="SongModel.Id" Disabled="true" />
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Title:</label>
+ <InputText class="form-control" @bind-Value="SongModel.Title" />
+ <ValidationMessage For="() => SongModel.Title" class="text-danger" />
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Artist:</label>
+ <InputSelect class="form-select" @bind-Value="SongModel.ArtistId">
+ <option value="0">Choose...</option>
+ @foreach (var a in artists)
+ {
+ <option value="@a.Id">@a.Name</option>
+ }
+ </InputSelect>
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Album:</label>
+ <InputSelect class="form-select" @bind-Value="SongModel.AlbumId">
+ <option value="0">Choose...</option>
+ @foreach (var al in albums)
+ {
+ <option value="@al.Id">@al.Title</option>
+ }
+ </InputSelect>
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Genre:</label>
+ <InputSelect class="form-select" @bind-Value="SongModel.GenreId">
+ <option value="0">Choose...</option>
+ @foreach (var g in genres)
+ {
+ <option value="@g.Id">@g.Name</option>
+ }
+ </InputSelect>
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Duration (sec):</label>
+ <InputNumber class="form-control" @bind-Value="SongModel.Duration" />
+ </div>
+
+ <button type="submit" class="btn btn-primary">Create</button>
+ </EditForm>
+</div>
+
+<div>
+ <a href="/admin/songs">Back to List</a>
+</div>
+
+@code {
+ [SupplyParameterFromForm]
+ private MeowsicLabzz.Components.Domain.Song SongModel { get; set; } = new MeowsicLabzz.Components.Domain.Song();
+ private List<MeowsicLabzz.Components.Domain.Artist> artists = new();
+ private List<MeowsicLabzz.Components.Domain.Album> albums = new();
+ private List<MeowsicLabzz.Components.Domain.Genre> genres = new();
+
+ protected override async Task OnInitializedAsync()
+ {
+ artists = await Db.Artists.OrderBy(a => a.Name).ToListAsync();
+ albums = await Db.Albums.OrderBy(a => a.Title).ToListAsync();
+ genres = await Db.Genres.OrderBy(g => g.Name).ToListAsync();
+ }
+
+ private async Task AddSong()
+ {
+ Db.Songs.Add(SongModel);
+ await Db.SaveChangesAsync();
+ NavigationManager.NavigateTo("/admin/songs");
+ }
+}

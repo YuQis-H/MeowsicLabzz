@@ -1,0 +1,51 @@
+@page "/admin/artist/delete"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@using MeowsicLabzz.Data
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete Artist (Admin)</PageTitle>
+
+<h3>Delete Artist (Admin)</h3>
+
+@if (artist is null)
+{
+ <p><em>Loading...</em></p>
+}
+else
+{
+ <div class="card mb-3 p-3 bg-purple">
+ <h4>Artist</h4>
+ <dl class="row">
+ <dt class="col-sm-2">Name</dt>
+ <dd class="col-sm-10">@artist.Name</dd>
+ </dl>
+ <EditForm method="post" Model="artist" OnValidSubmit="DeleteArtist" FormName="delete" Enhance>
+ <button type="submit" class="btn btn-danger" disabled="@(artist is null)">Delete</button>
+ <a class="btn btn-link" href="/admin/artists">Back to List</a>
+ </EditForm>
+ </div>
+}
+
+@code {
+ [SupplyParameterFromQuery]
+ private int Id { get; set; }
+
+ private MeowsicLabzz.Components.Domain.Artist? artist;
+
+ protected override async Task OnInitializedAsync()
+ {
+ using var context = DbFactory.CreateDbContext();
+ artist = await context.Artists.FirstOrDefaultAsync(a => a.Id == Id);
+ if (artist is null) NavigationManager.NavigateTo("/notfound");
+ }
+
+ private async Task DeleteArtist()
+ {
+ using var context = DbFactory.CreateDbContext();
+ context.Artists.Remove(artist!);
+ await context.SaveChangesAsync();
+ NavigationManager.NavigateTo("/admin/artists");
+ }
+}

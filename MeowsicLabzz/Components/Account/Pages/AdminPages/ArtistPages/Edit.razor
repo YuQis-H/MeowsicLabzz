@@ -1,0 +1,108 @@
+@page "/admin/artist/edit"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@using MeowsicLabzz.Data
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Administrator")]
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Artist (Admin)</PageTitle>
+
+<h3>Edit Artist (Admin)</h3>
+
+@if (ArtistModel is null)
+{
+ <p><em>Loading...</em></p>
+}
+else
+{
+ <div class="card mb-3 p-3 bg-purple">
+ <EditForm method="post" Model="ArtistModel" OnValidSubmit="UpdateArtist" FormName="edit" Enhance>
+ <DataAnnotationsValidator />
+ <ValidationSummary class="text-danger" />
+
+ <input type="hidden" name="ArtistModel.Id" value="@ArtistModel.Id" />
+
+ <div class="mb-3">
+ <label class="form-label">Id:</label>
+ <InputNumber class="form-control bg-light" @bind-Value="ArtistModel.Id" Disabled="true" />
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Name:</label>
+ <InputText class="form-control" @bind-Value="ArtistModel.Name" />
+ <ValidationMessage For="() => ArtistModel.Name" class="text-danger" />
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">ArtistType:</label>
+ <InputSelect class="form-select" @bind-Value="ArtistModel.ArtistType">
+ <option value="">Choose...</option>
+ <option value="Soloist">Soloist</option>
+ <option value="Band">Band</option>
+ </InputSelect>
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Gender:</label>
+ <InputSelect class="form-select" @bind-Value="ArtistModel.Gender">
+ <option value="">Choose...</option>
+ <option value="Female">Female</option>
+ <option value="Male">Male</option>
+ <option value="Mixed">Mixed</option>
+ </InputSelect>
+ </div>
+
+ <button type="submit" class="btn btn-primary">Save</button>
+ </EditForm>
+ </div>
+}
+
+<div>
+ <a href="/admin/artists">Back to List</a>
+</div>
+
+@code {
+ [SupplyParameterFromQuery]
+ private int Id { get; set; }
+
+ [SupplyParameterFromForm]
+ private MeowsicLabzz.Components.Domain.Artist? ArtistModel { get; set; }
+
+ protected override async Task OnInitializedAsync()
+ {
+ using var context = DbFactory.CreateDbContext();
+ ArtistModel ??= await context.Artists.FirstOrDefaultAsync(a => a.Id == Id);
+ if (ArtistModel is null) NavigationManager.NavigateTo("/notfound");
+ }
+
+ private async Task UpdateArtist()
+ {
+ using var context = DbFactory.CreateDbContext();
+ context.Attach(ArtistModel!).State = EntityState.Modified;
+ try
+ {
+ await context.SaveChangesAsync();
+ }
+ catch (DbUpdateConcurrencyException)
+ {
+ if (!ArtistExists(ArtistModel!.Id))
+ {
+ NavigationManager.NavigateTo("/notfound");
+ }
+ else
+ {
+ throw;
+ }
+ }
+
+ NavigationManager.NavigateTo("/admin/artists");
+ }
+
+ private bool ArtistExists(int id)
+ {
+ using var context = DbFactory.CreateDbContext();
+ return context.Artists.Any(e => e.Id == id);
+ }
+}

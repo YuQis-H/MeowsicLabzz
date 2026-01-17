@@ -1,0 +1,62 @@
+@page "/admin/genre/edit"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Genre (Admin)</PageTitle>
+
+<h3>Edit Genre (Admin)</h3>
+
+@if (GenreModel is null)
+{
+ <p><em>Loading...</em></p>
+}
+else
+{
+ <div class="card mb-3 p-3 bg-purple">
+ <EditForm Model="GenreModel" OnValidSubmit="UpdateGenre">
+ <DataAnnotationsValidator />
+ <ValidationSummary class="text-danger" />
+
+ <div class="mb-3">
+ <label class="form-label">Id:</label>
+ <InputNumber class="form-control bg-light" @bind-Value="GenreModel.Id" Disabled="true" />
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Name:</label>
+ <InputText class="form-control" @bind-Value="GenreModel.Name" />
+ <ValidationMessage For="() => GenreModel.Name" class="text-danger" />
+ </div>
+
+ <button type="submit" class="btn btn-primary">Save</button>
+ </EditForm>
+ </div>
+}
+
+<div>
+ <a href="/admin/genres">Back to List</a>
+</div>
+
+@code {
+ [SupplyParameterFromQuery]
+ private int Id { get; set; }
+
+ private MeowsicLabzz.Components.Domain.Genre? GenreModel { get; set; }
+
+ protected override async Task OnInitializedAsync()
+ {
+ GenreModel = await Db.Genres.FirstOrDefaultAsync(g => g.Id == Id);
+ if (GenreModel is null) NavigationManager.NavigateTo("/notfound");
+ }
+
+ private async Task UpdateGenre()
+ {
+ Db.Attach(GenreModel!).State = EntityState.Modified;
+ await Db.SaveChangesAsync();
+ NavigationManager.NavigateTo("/admin/genres");
+ }
+}

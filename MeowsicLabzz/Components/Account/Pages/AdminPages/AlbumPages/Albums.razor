@@ -1,0 +1,64 @@
+﻿@page "/admin/albums"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<h3>💿 Manage Albums</h3>
+<NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
+<NavLink class="btn btn-primary mb-3 ms-2" href="/admin/album/create">Create New Album</NavLink>
+
+@if (albumRows is null)
+{
+ <p><em>Loading...</em></p>
+}
+else if (!albumRows.Any())
+{
+ <p>No albums found.</p>
+}
+else
+{
+ <QuickGrid Class="table" Items="Db.Albums">
+ <PropertyColumn Property="al => al.Id" />
+ <PropertyColumn Property="al => al.Title" />
+ <TemplateColumn Context="al">
+ @(
+ Db.Artists.Where(a => a.Id == al.ArtistId).Select(a => a.Name).FirstOrDefault()
+ )
+ </TemplateColumn>
+ <TemplateColumn Context="al">
+ <a class="me-2" href="@($"/admin/album/edit?id={al.Id}")">Edit</a>
+ <a class="me-2" href="@($"/admin/album/delete?id={al.Id}")">Delete</a>
+ </TemplateColumn>
+ </QuickGrid>
+}
+
+@code {
+ private List<(int Id, string Title, string ArtistName)>? albumRows;
+
+ protected override async Task OnInitializedAsync()
+ {
+ await LoadAlbums();
+ }
+
+ private async Task LoadAlbums()
+ {
+ var temp = await Db.Albums
+ .Select(al => new
+ {
+ al.Id,
+ al.Title,
+ ArtistName = Db.Artists.Where(a => a.Id == al.ArtistId).Select(a => a.Name).FirstOrDefault()
+ })
+ .OrderBy(al => al.Id)
+ .ToListAsync();
+
+ albumRows = temp.Select(x => (x.Id, x.Title ?? string.Empty, x.ArtistName ?? string.Empty)).ToList();
+ StateHasChanged();
+ }
+
+ private void GoBack() => NavigationManager.NavigateTo("/admin");
+}

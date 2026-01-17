@@ -1,0 +1,67 @@
+@page "/admin/artist/create"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Artist (Admin)</PageTitle>
+
+<h3>Create Artist (Admin)</h3>
+
+<div class="card mb-3 p-3 bg-purple">
+ <EditForm method="post" Model="ArtistModel" OnValidSubmit="AddArtist" FormName="create" Enhance>
+ <DataAnnotationsValidator />
+ <ValidationSummary class="text-danger" />
+
+ <div class="mb-3">
+ <label class="form-label">Id:</label>
+ <InputNumber class="form-control bg-light" @bind-Value="ArtistModel.Id" Disabled="true" />
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Name:</label>
+ <InputText class="form-control" @bind-Value="ArtistModel.Name" />
+ <ValidationMessage For="() => ArtistModel.Name" class="text-danger" />
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Type:</label>
+ <InputSelect class="form-select" @bind-Value="ArtistModel.ArtistType">
+ <option value="">Choose...</option>
+ <option value="Soloist">Soloist</option>
+ <option value="Band">Band</option>
+ </InputSelect>
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Gender:</label>
+ <InputSelect class="form-select" @bind-Value="ArtistModel.Gender">
+ <option value="">Choose...</option>
+ <option value="Female">Female</option>
+ <option value="Male">Male</option>
+ <option value="Mixed">Mixed</option>
+ </InputSelect>
+ </div>
+
+ <button type="submit" class="btn btn-primary">Create</button>
+ </EditForm>
+</div>
+
+<div>
+ <a href="/admin/artists">Back to List</a>
+</div>
+
+@code {
+ [SupplyParameterFromForm]
+ private MeowsicLabzz.Components.Domain.Artist ArtistModel { get; set; } = new MeowsicLabzz.Components.Domain.Artist();
+
+ private async Task AddArtist()
+ {
+ Db.Artists.Add(ArtistModel);
+ await Db.SaveChangesAsync();
+ NavigationManager.NavigateTo("/admin/artists");
+ }
+}

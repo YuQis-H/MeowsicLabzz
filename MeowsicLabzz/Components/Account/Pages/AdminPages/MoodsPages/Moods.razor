@@ -7,11 +7,7 @@
 
 <h3>🎭 Manage Moods</h3>
 <NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
-
-<div class="mb-3">
- <input class="form-control" placeholder="New mood name" @bind="newName" />
- <button class="btn btn-primary mt-2" @onclick="AddMood">Add Mood</button>
-</div>
+<NavLink class="btn btn-primary mb-3 ms-2" href="/moods/create">Create New Mood</NavLink>
 
 @if (moods is null)
 {
@@ -38,7 +34,10 @@ else
  <td>@m.Id</td>
  <td>@m.Name</td>
  <td>
+ <a class="me-2" href="@($"/moods/edit?id={m.Id}")">Edit</a>
+ <AuthorizeView Roles="Administrator">
  <button class="btn btn-danger btn-sm" @onclick="() => DeleteMood(m.Id)">Delete</button>
+ </AuthorizeView>
  </td>
  </tr>
  }
@@ -48,7 +47,6 @@ else
 
 @code {
  private List<MeowsicLabzz.Components.Domain.Mood>? moods;
- private string? newName;
 
  protected override async Task OnInitializedAsync()
  {
@@ -59,18 +57,6 @@ else
  {
  moods = await Db.Moods.OrderBy(m => m.Id).ToListAsync();
  StateHasChanged();
- }
-
- private async Task AddMood()
- {
- if (string.IsNullOrWhiteSpace(newName))
- return;
-
- var mood = new MeowsicLabzz.Components.Domain.Mood { Name = newName.Trim() };
- Db.Moods.Add(mood);
- await Db.SaveChangesAsync();
- newName = string.Empty;
- await LoadMoods();
  }
 
  private async Task DeleteMood(int id)

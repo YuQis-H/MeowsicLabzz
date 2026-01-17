@@ -1,4 +1,4 @@
-﻿@page "/moods"
+@page "/admin/moods/index"
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using MeowsicLabzz.Components.Domain
@@ -6,21 +6,22 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Admin - Moods</PageTitle>
 
-<h1>Index</h1>
+<h3>?? Manage Moods (Admin)</h3>
 
 <p>
- <a href="/moods/create">Create New</a>
+ <a href="/admin/moods/create">Create New</a>
 </p>
 
 <QuickGrid Class="table" Items="context.Moods">
+ <PropertyColumn Property="mood => mood.Id" />
  <PropertyColumn Property="mood => mood.Name" />
 
  <TemplateColumn Context="mood">
- <a href="@($"/moods/edit?id={mood.Id}")">Edit</a> |
- <a href="@($"/moods/details?id={mood.Id}")">Details</a> |
- <a href="@($"/moods/delete?id={mood.Id}")">Delete</a>
+ <a href="@($"/admin/moods/edit?id={mood.Id}")">Edit</a> |
+ <a href="@($"/admin/moods/details?id={mood.Id}")">Details</a> |
+ <a href="@($"/admin/moods/delete?id={mood.Id}")">Delete</a>
  </TemplateColumn>
 </QuickGrid>
 

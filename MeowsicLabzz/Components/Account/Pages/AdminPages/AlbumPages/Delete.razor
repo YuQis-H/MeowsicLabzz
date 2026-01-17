@@ -1,0 +1,51 @@
+@page "/admin/album/delete"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@using MeowsicLabzz.Data
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete Album (Admin)</PageTitle>
+
+<h3>Delete Album (Admin)</h3>
+
+@if (album is null)
+{
+ <p><em>Loading...</em></p>
+}
+else
+{
+ <div class="card mb-3 p-3 bg-purple">
+ <h4>Album</h4>
+ <dl class="row">
+ <dt class="col-sm-2">Title</dt>
+ <dd class="col-sm-10">@album.Title</dd>
+ </dl>
+ <EditForm method="post" Model="album" OnValidSubmit="DeleteAlbum" FormName="delete" Enhance>
+ <button type="submit" class="btn btn-danger" disabled="@(album is null)">Delete</button>
+ <a class="btn btn-link" href="/admin/albums">Back to List</a>
+ </EditForm>
+ </div>
+}
+
+@code {
+ [SupplyParameterFromQuery]
+ private int Id { get; set; }
+
+ private MeowsicLabzz.Components.Domain.Album? album;
+
+ protected override async Task OnInitializedAsync()
+ {
+ using var context = DbFactory.CreateDbContext();
+ album = await context.Albums.FirstOrDefaultAsync(a => a.Id == Id);
+ if (album is null) NavigationManager.NavigateTo("/notfound");
+ }
+
+ private async Task DeleteAlbum()
+ {
+ using var context = DbFactory.CreateDbContext();
+ context.Albums.Remove(album!);
+ await context.SaveChangesAsync();
+ NavigationManager.NavigateTo("/admin/albums");
+ }
+}

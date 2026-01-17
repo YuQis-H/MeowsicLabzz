@@ -1,169 +1,321 @@
 ﻿@page "/myplaylist"
 @using System.Linq
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
 
 <header class="d-flex align-items-center justify-content-between p-4 mb-4 rounded" style="background: linear-gradient(90deg,#ff7a88,#7b61ff); color:white;">
-    <div class="d-flex align-items-center gap-3">
-        <div class="d-flex align-items-center justify-content-center rounded-circle" style="width:64px;height:64px;background:rgba(255,255,255,0.12);">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" class="text-white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M3 10.5v6A2.5 2.5 0 0 0 5.5 19h11A2.5 2.5 0 0 0 19 16.5v-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M9 8V3l8 3v5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </div>
+ <div class="d-flex align-items-center gap-3">
+ <div class="d-flex align-items-center justify-content-center rounded-circle" style="width:64px;height:64px;background:rgba(255,255,255,0.22);">
+ <span style="display:inline-block;font-size:26px;line-height:1;">🐈‍⬛</span>
+ </div>
 
-        <div>
-            <h1 class="h4 mb-1">My Playlists</h1>
-            <div class="d-block opacity-85" style="font-size:0.95rem;">Save, organize and play your favorite sets. Start by adding a playlist.</div>
-        </div>
-    </div>
+ <div>
+ <h1 class="h4 mb-1">My Playlists</h1>
+ <div class="d-block opacity-85" style="font-size:0.95rem;">Save, organize and play your favorite sets. Start by adding a playlist.</div>
+ </div>
+ </div>
 
-    <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-light btn-sm" @onclick="AddPlaylist"><span class="me-1">+</span> Add playlist</button>
-    </div>
+ <div class="d-flex align-items-center gap-2">
+ <button class="btn btn-light btn-sm" @onclick="AddPlaylist"><span class="me-1">+</span> Add playlist</button>
+ </div>
 </header>
 
 <div class="container-sm">
-    @if (!playlists.Any())
-    {
-        <div class="text-center py-5">
-            <div class="mb-3">
-                <svg width="120" height="80" viewBox="0 0 120 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <rect x="6" y="12" width="108" height="56" rx="8" fill="rgba(123,97,255,0.08)"/>
-                    <path d="M30 30h60M30 40h40" stroke="#7b61ff" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <h2 class="h5 mb-2">No playlists yet</h2>
-            <p class="text-muted mb-3">Create playlists to collect songs for moods, parties, or study sessions.</p>
-            <button class="btn btn-primary btn-lg" @onclick="AddPlaylist">Create your first playlist</button>
-        </div>
-    }
-    else
-    {
-        <div class="row g-3">
-            @for (int i = 0; i < playlists.Count; i++)
-            {
-                var pl = playlists[i];
-                <div class="col-sm-6 col-md-4">
-                    <div class="card h-100 shadow-sm" style="@GetCardStyle(i)">
-                        <div class="card-body d-flex gap-3 align-items-center">
-                            <div class="rounded-circle text-white d-flex align-items-center justify-content-center" style="@GetAvatarStyle(i)">
-                                @pl.Initials
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="fw-semibold text-dark playlist-name">@pl.Title</div>
-                                <div class="text-muted small">@pl.Description</div>
-                            </div>
-                            <div class="ms-auto d-flex gap-2 align-items-center">
-                                <button class="btn btn-outline-primary btn-sm" @onclick="() => Play(pl)">Play</button>
-                                <button class="btn btn-outline-secondary btn-sm" @onclick="() => Remove(pl)">Remove</button>
-                            </div>
-                        </div>
-                        <div class="card-footer text-muted small">
-                            @pl.TrackCount songs • created @pl.CreatedAt.ToString("MMM d, yyyy")
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
+ @if (allSongs is null)
+ {
+ <p><em>Loading...</em></p>
+ }
+ else
+ {
+ <div class="row g-4 mb-4">
+ <div class="col-12">
+ <h5 class="mb-3">My Fav Playlists</h5>
+ </div>
+ <div class="col-md-4">
+ <div class="card p-3 bg-purple h-100 auto-playlist-card" style="position:relative;">
+ <button class="btn btn-sm btn-outline-light edit-btn" @onclick='() => EditAutoPlaylist("featured")'>Edit</button>
+ <h6>Featured — Top Songs</h6>
+ <p class="text-muted small">First songs in the library</p>
+ <ol class="list-group list-group-flush playlist-list">
+ @foreach (var s in featured)
+ {
+ <li class="list-group-item bg-transparent border-0 px-0 py-2">
+ <div class="d-flex justify-content-between align-items-start">
+ <div>
+ <strong class="track-title">@s.Title</strong>
+ <div class="small text-muted track-sub">@s.ArtistName — @s.AlbumTitle</div>
+ </div>
+ <div class="small text-muted track-duration">@FormatDuration(s.Duration)</div>
+ </div>
+ </li>
+ }
+ </ol>
+ </div>
+ </div>
+ <div class="col-md-4">
+ <div class="card p-3 bg-purple h-100 auto-playlist-card" style="position:relative;">
+ <button class="btn btn-sm btn-outline-light edit-btn" @onclick='() => EditAutoPlaylist("albumPicks")'>Edit</button>
+ <h6>Album Picks</h6>
+ <p class="text-muted small">One highlight track per album</p>
+ <ol class="list-group list-group-flush playlist-list">
+ @foreach (var s in albumPicks)
+ {
+ <li class="list-group-item bg-transparent border-0 px-0 py-2">
+ <div class="d-flex justify-content-between align-items-start">
+ <div>
+ <strong class="track-title">@s.Title</strong>
+ <div class="small text-muted track-sub">@s.ArtistName — @s.AlbumTitle</div>
+ </div>
+ <div class="small text-muted track-duration">@FormatDuration(s.Duration)</div>
+ </div>
+ </li>
+ }
+ </ol>
+ </div>
+ </div>
+ <div class="col-md-4">
+ <div class="card p-3 bg-purple h-100 auto-playlist-card" style="position:relative;">
+ <button class="btn btn-sm btn-outline-light edit-btn" @onclick='() => EditAutoPlaylist("artistSpotlight")'>Edit</button>
+ <h6>Artist Spotlight</h6>
+ <p class="text-muted small">Popular artists' tracks</p>
+ <ol class="list-group list-group-flush playlist-list">
+ @foreach (var s in artistSpotlight)
+ {
+ <li class="list-group-item bg-transparent border-0 px-0 py-2">
+ <div class="d-flex justify-content-between align-items-start">
+ <div>
+ <strong class="track-title">@s.Title</strong>
+ <div class="small text-muted track-sub">@s.ArtistName — @s.AlbumTitle</div>
+ </div>
+ <div class="small text-muted track-duration">@FormatDuration(s.Duration)</div>
+ </div>
+ </li>
+ }
+ </ol>
+ </div>
+ </div>
+ </div>
+
+ @if (!playlists.Any())
+ {
+ <div class="text-center py-5">
+ <div class="mb-3">
+ <svg width="120" height="80" viewBox="0012080" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+ <rect x="6" y="12" width="108" height="56" rx="8" fill="rgba(123,97,255,0.08)"/>
+ <path d="M3030h60M3040h40" stroke="#7b61ff" stroke-width="2.5" stroke-linecap="round"/>
+ </svg>
+ </div>
+ <h2 class="h5 mb-2">No playlists yet</h2>
+ <p class="text-muted mb-3">Create playlists to collect songs for moods, parties, or study sessions.</p>
+ <button class="btn btn-primary btn-lg" @onclick="AddPlaylist">Create your first playlist</button>
+ </div>
+ }
+ else
+ {
+ <div class="row g-3">
+ @for (int i =0; i < playlists.Count; i++)
+ {
+ var pl = playlists[i];
+ <div class="col-sm-6 col-md-4">
+ <div class="card h-100 shadow-sm" style="@GetCardStyle(i)">
+ <div class="card-body d-flex gap-3 align-items-center">
+ <div class="rounded-circle text-white d-flex align-items-center justify-content-center" style="@GetAvatarStyle(i)">
+ @pl.Initials
+ </div>
+ <div class="flex-grow-1">
+ <div class="fw-semibold text-dark playlist-name">@pl.Title</div>
+ <div class="text-muted small">@pl.Description</div>
+ </div>
+ <div class="ms-auto d-flex gap-2 align-items-center">
+ <button class="btn btn-outline-primary btn-sm" @onclick="() => Play(pl)">Play</button>
+ <button class="btn btn-outline-secondary btn-sm" @onclick="() => Remove(pl)">Remove</button>
+ </div>
+ </div>
+ <div class="card-footer text-muted small">
+ @pl.TrackCount songs • created @pl.CreatedAt.ToString("MMM d, yyyy")
+ </div>
+ </div>
+ </div>
+ }
+ </div>
+ }
+ }
 </div>
 
 @code {
-    // Added dummy/sample playlists
-    private List<PlaylistSummary> playlists = new()
-    {
-        new PlaylistSummary
-        {
-            Title = "Chill Mix",
-            Description = "Laid-back favorites for relaxing",
-            TrackCount = 18,
-            CreatedAt = DateTime.UtcNow.AddDays(-10)
-        },
-        new PlaylistSummary
-        {
-            Title = "Morning Boost",
-            Description = "Uplifting tracks to start your day",
-            TrackCount = 25,
-            CreatedAt = DateTime.UtcNow.AddDays(-30)
-        },
-        new PlaylistSummary
-        {
-            Title = "Late Night Jazz",
-            Description = "Smooth jazz for late nights",
-            TrackCount = 14,
-            CreatedAt = DateTime.UtcNow.AddDays(-5)
-        }
-    };
+ // user playlists (editable) - initially empty; auto playlists are shown above
+ private List<PlaylistSummary> playlists = new();
 
-    // Palette used for avatar backgrounds and card accents
-    private readonly string[] AvatarGradients = new[]
-    {
-        "linear-gradient(135deg,#ff7a88,#ffb199)",
-        "linear-gradient(135deg,#7b61ff,#61d4ff)",
-        "linear-gradient(135deg,#94f9a0,#4db6ff)",
-        "linear-gradient(135deg,#ffd36b,#ff7ab6)",
-        "linear-gradient(135deg,#7ef0a4,#9d7bff)"
-    };
+ // auto-generated
+ private List<SongRow>? allSongs;
+ private List<SongRow> featured = new();
+ private List<SongRow> albumPicks = new();
+ private List<SongRow> artistSpotlight = new();
 
-    private readonly string[] AccentColors = new[]
-    {
-        "#ff7a88",
-        "#7b61ff",
-        "#94f9a0",
-        "#ffd36b",
-        "#7ef0a4"
-    };
+ // Palette used for avatar backgrounds and card accents
+ private readonly string[] AvatarGradients = new[]
+ {
+ "linear-gradient(135deg,#ff7a88,#ffb199)",
+ "linear-gradient(135deg,#7b61ff,#61d4ff)",
+ "linear-gradient(135deg,#94f9a0,#4db6ff)",
+ "linear-gradient(135deg,#ffd36b,#ff7ab6)",
+ "linear-gradient(135deg,#7ef0a4,#9d7bff)"
+ };
 
-    private string GetAvatarStyle(int index)
-        => $"width:56px;height:56px;background:{AvatarGradients[index % AvatarGradients.Length]}; font-weight:600;";
+ private readonly string[] AccentColors = new[]
+ {
+ "#ff7a88",
+ "#7b61ff",
+ "#94f9a0",
+ "#ffd36b",
+ "#7ef0a4"
+ };
 
-    // Add a subtle colored accent (left border) so boxes get color without hurting text contrast
-    private string GetCardStyle(int index)
-        => $"border-left:6px solid {AccentColors[index % AccentColors.Length]};";
+ private string GetAvatarStyle(int index)
+ => $"width:56px;height:56px;background:{AvatarGradients[index % AvatarGradients.Length]}; font-weight:600;";
 
-    private void AddPlaylist()
-    {
-        // demo behavior: add a sample playlist
-        playlists.Add(new PlaylistSummary
-        {
-            Title = $"New Playlist {playlists.Count + 1}",
-            Description = "A freshly created playlist",
-            TrackCount = 0,
-            CreatedAt = DateTime.UtcNow
-        });
-    }
+ // Add a subtle colored accent (left border) so boxes get color without hurting text contrast
+ private string GetCardStyle(int index)
+ => $"border-left:6px solid {AccentColors[index % AccentColors.Length]};";
 
-    private void Remove(PlaylistSummary pl) => playlists.Remove(pl);
+ protected override async Task OnInitializedAsync()
+ {
+ await LoadSongs();
+ BuildPlaylists();
+ }
 
-    private void Play(PlaylistSummary pl)
-    {
-        // placeholder: wire player logic here
-    }
+ private async Task LoadSongs()
+ {
+ var temp = await Db.Songs
+ .Select(s => new
+ {
+ s.Id,
+ s.Title,
+ s.Duration,
+ ArtistName = Db.Artists.Where(a => a.Id == s.ArtistId).Select(a => a.Name).FirstOrDefault(),
+ AlbumTitle = Db.Albums.Where(al => al.Id == s.AlbumId).Select(al => al.Title).FirstOrDefault()
+ })
+ .OrderBy(s => s.Id)
+ .ToListAsync();
 
-    private sealed class PlaylistSummary
-    {
-        public string Title { get; init; } = default!;
-        public string Description { get; init; } = default!;
-        public int TrackCount { get; init; }
-        public DateTime CreatedAt { get; init; }
-        public string Initials => string.Concat(Title?.Split(' ').Select(s => s.FirstOrDefault()).Where(c => c != '\0')).ToUpperInvariant();
-    }
+ allSongs = temp.Select(x => new SongRow
+ {
+ Id = x.Id,
+ Title = x.Title ?? string.Empty,
+ Duration = x.Duration,
+ ArtistName = x.ArtistName ?? string.Empty,
+ AlbumTitle = x.AlbumTitle ?? string.Empty
+ }).ToList();
+ }
+
+ private void BuildPlaylists()
+ {
+ if (allSongs is null) return;
+
+ // Featured: first8 songs
+ featured = allSongs.Take(8).ToList();
+
+ // Album Picks: one song per album (first encountered), limit to8 albums
+ albumPicks = allSongs
+ .GroupBy(s => s.AlbumTitle)
+ .Select(g => g.First())
+ .Where(s => !string.IsNullOrEmpty(s.AlbumTitle))
+ .Take(8)
+ .ToList();
+
+ // Artist Spotlight: take songs from top3 artists (by count)
+ var topArtists = allSongs
+ .GroupBy(s => s.ArtistName)
+ .OrderByDescending(g => g.Count())
+ .Where(g => !string.IsNullOrEmpty(g.Key))
+ .Take(3)
+ .Select(g => g.Key)
+ .ToHashSet();
+
+ artistSpotlight = allSongs.Where(s => topArtists.Contains(s.ArtistName)).Take(12).ToList();
+ }
+
+ private void AddPlaylist()
+ {
+ // Add a simple empty user playlist
+ playlists.Add(new PlaylistSummary
+ {
+ Title = $"New Playlist {playlists.Count +1}",
+ Description = "A freshly created playlist",
+ TrackCount =0,
+ CreatedAt = DateTime.UtcNow
+ });
+ }
+
+ private void Remove(PlaylistSummary pl) => playlists.Remove(pl);
+
+ private void Play(PlaylistSummary pl)
+ {
+ // placeholder: wire player logic here
+ }
+
+ private void EditAutoPlaylist(string id)
+ {
+ // navigate to an edit route for the auto playlist (placeholder)
+ NavigationManager.NavigateTo($"/myplaylist/edit?type={id}");
+ }
+
+ private string FormatDuration(int seconds)
+ {
+ var ts = TimeSpan.FromSeconds(seconds);
+ return seconds >=3600 ? ts.ToString(@"h\:mm\:ss") : ts.ToString(@"m\:ss");
+ }
+
+ private class SongRow
+ {
+ public int Id { get; set; }
+ public string Title { get; set; } = string.Empty;
+ public int Duration { get; set; }
+ public string ArtistName { get; set; } = string.Empty;
+ public string AlbumTitle { get; set; } = string.Empty;
+ }
+
+ private sealed class PlaylistSummary
+ {
+ public string Title { get; init; } = default!;
+ public string Description { get; init; } = default!;
+ public int TrackCount { get; init; }
+ public DateTime CreatedAt { get; init; }
+ public string Initials => string.Concat(Title?.Split(' ').Select(s => s.FirstOrDefault()).Where(c => c != '\0')).ToUpperInvariant();
+ }
 }
 
 <style>
+.auto-playlist-card {
+ color: #ece9f8; /* brighter text */
+ /* lighter, more translucent background so contents are easier to read */
+ background: linear-gradient(180deg, rgba(123,97,255,0.16), rgba(123,97,255,0.06)) !important;
+ border-radius:12px;
+ padding:1rem;
+}
+.auto-playlist-card .track-title { color: #ffffff; opacity:0.95; }
+.auto-playlist-card .track-sub { color: rgba(255,255,255,0.65); }
+.auto-playlist-card .track-duration { color: rgba(255,255,255,0.7); }
+.auto-playlist-card .text-muted { color: rgba(255,255,255,0.6) !important; }
+.auto-playlist-card .list-group-item { padding-left:0; padding-right:0; }
+.auto-playlist-card .edit-btn { position:absolute; top:10px; right:10px; }
+
 .playlist-name {
-    color: #111827; /* darker title for better contrast */
+ color: #111827; /* darker title for better contrast */
 }
 
 /* ensure initials are readable */
 .card .rounded-circle.text-white {
-    width:56px;
-    height:56px;
-    font-size:1rem;
-    color: #fff;
+ width:56px;
+ height:56px;
+ font-size:1rem;
+ color: #fff;
 }
 
 /* small polish: make card-footer slightly lighter so accent stands out */
 .card-footer {
-    background: transparent;
+ background: transparent;
 }
 </style>

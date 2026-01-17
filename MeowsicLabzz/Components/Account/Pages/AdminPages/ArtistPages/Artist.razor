@@ -1,0 +1,53 @@
+﻿@page "/admin/artists"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<h3>🎤 Manage Artists</h3>
+<NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
+<NavLink class="btn btn-primary mb-3 ms-2" href="/admin/artist/create">Create New Artist</NavLink>
+
+@if (artists is null)
+{
+ <p><em>Loading...</em></p>
+}
+else if (!artists.Any())
+{
+ <p>No artists found.</p>
+}
+else
+{
+ <QuickGrid Class="table" Items="Db.Artists">
+ <PropertyColumn Property="a => a.Id" />
+ <PropertyColumn Property="a => a.Name" />
+ <PropertyColumn Property="a => a.ArtistType" />
+ <PropertyColumn Property="a => a.Gender" />
+ <TemplateColumn Context="a">
+ <a class="me-2" href="@($"/admin/artist/edit?id={a.Id}")">Edit</a>
+ <a class="me-2" href="@($"/admin/artist/delete?id={a.Id}")">Delete</a>
+ </TemplateColumn>
+ </QuickGrid>
+}
+
+@code {
+ private List<MeowsicLabzz.Components.Domain.Artist>? artists;
+
+ protected override async Task OnInitializedAsync()
+ {
+ await LoadArtists();
+ }
+
+ private async Task LoadArtists()
+ {
+ artists = await Db.Artists.OrderBy(a => a.Id).ToListAsync();
+ StateHasChanged();
+ }
+
+ private void GoBack()
+ {
+ NavigationManager.NavigateTo("/admin");
+ }
+}

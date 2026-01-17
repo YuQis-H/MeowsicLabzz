@@ -1,0 +1,46 @@
+﻿@page "/admin/genres"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<h3>🎼 Manage Genres</h3>
+<NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
+<NavLink class="btn btn-primary mb-3 ms-2" href="/admin/genre/create">Create New Genre</NavLink>
+
+@if (genres is null)
+{
+ <p><em>Loading...</em></p>
+}
+else if (!genres.Any())
+{
+ <p>No genres found.</p>
+}
+else
+{
+ <QuickGrid Class="table" Items="Db.Genres">
+ <PropertyColumn Property="g => g.Id" />
+ <PropertyColumn Property="g => g.Name" />
+ <TemplateColumn Context="g">
+ <a class="me-2" href="@($"/admin/genre/edit?id={g.Id}")">Edit</a>
+ <a class="me-2" href="@($"/admin/genre/delete?id={g.Id}")">Delete</a>
+ </TemplateColumn>
+ </QuickGrid>
+}
+
+@code {
+ private List<MeowsicLabzz.Components.Domain.Genre>? genres;
+
+ protected override async Task OnInitializedAsync()
+ {
+ genres = await Db.Genres.OrderBy(g => g.Id).ToListAsync();
+ StateHasChanged();
+ }
+
+ private void GoBack()
+ {
+ NavigationManager.NavigateTo("/admin");
+ }
+}

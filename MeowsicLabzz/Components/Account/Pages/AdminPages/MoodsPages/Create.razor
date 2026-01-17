@@ -1,0 +1,46 @@
+@page "/admin/moods/create"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h3>Create Mood (Admin)</h3>
+
+<div class="border border-3 border-danger p-3 mb-3 rounded">
+ <EditForm Model="Mood" OnValidSubmit="AddMood">
+ <DataAnnotationsValidator />
+ <ValidationSummary class="text-danger" />
+
+ <div class="mb-3">
+ <label class="form-label">Id:</label>
+ <InputNumber class="form-control bg-light" @bind-Value="Mood.Id" Disabled="true" />
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Name:</label>
+ <InputText class="form-control" @bind-Value="Mood.Name" />
+ <ValidationMessage For="() => Mood.Name" class="text-danger" />
+ </div>
+
+ <button type="submit" class="btn btn-primary">Create</button>
+ </EditForm>
+</div>
+
+<div>
+ <a href="/admin/moods/manage">Back to List</a>
+</div>
+
+@code {
+ private Mood Mood { get; set; } = new Mood();
+
+ private async Task AddMood()
+ {
+ Db.Moods.Add(Mood);
+ await Db.SaveChangesAsync();
+ NavigationManager.NavigateTo("/admin/moods/manage");
+ }
+}
