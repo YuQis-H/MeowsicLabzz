@@ -3,6 +3,7 @@
 @using MeowsicLabzz.Components.Domain
 @inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "Administrator")]
 
 <PageTitle>Create</PageTitle>
 

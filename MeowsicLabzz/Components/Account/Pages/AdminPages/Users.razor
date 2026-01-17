@@ -14,6 +14,18 @@
 <h3>Users' Accounts</h3>
 <NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
 
+<div class="mb-3 d-flex gap-2">
+    <input class="form-control" placeholder="Search by email, first or last name" @bind="searchQuery" @bind:event="oninput" />
+    <button type="button" class="btn btn-primary" @onclick="SearchAsync">Search</button>
+    <button type="button" class="btn btn-outline-secondary" @onclick="ClearSearch">Clear</button>
+    <button type="button" class="btn btn-outline-secondary" @onclick="ShowAll" disabled="@string.IsNullOrWhiteSpace(searchQuery)">Show all</button>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(searchQuery))
+{
+    <div class="mb-2 text-muted">Showing results for "@searchQuery"</div>
+}
+
 @if (users is null)
 {
  <p><em>Loading...</em></p>
@@ -99,26 +111,56 @@ else
  private List<MeowsicLabzzUser>? users;
  private Dictionary<string, List<string>> userRoles = new();
 
- // edit state
+ // search / edit state
+ private string? searchQuery;
  private string? editingUserId;
  private string? editFirstName;
  private string? editLastName;
 
  protected override async Task OnInitializedAsync()
  {
- await LoadUsersAsync();
+     await LoadUsersAsync();
  }
 
- private async Task LoadUsersAsync()
+ // load all users or filtered by query (server-side filter using IQueryable)
+ private async Task LoadUsersAsync(string? query = null)
  {
- users = await UserManager.Users.OrderBy(u => u.Email).ToListAsync();
- userRoles.Clear();
- foreach (var u in users)
- {
- var roles = await UserManager.GetRolesAsync(u);
- userRoles[u.Id] = roles.ToList();
+     IQueryable<MeowsicLabzzUser> q = UserManager.Users;
+
+     if (!string.IsNullOrWhiteSpace(query))
+     {
+         var qLower = query.Trim().ToLower();
+         q = q.Where(u =>
+             (u.Email ?? "").ToLower().Contains(qLower) ||
+             (u.FirstName ?? "").ToLower().Contains(qLower) ||
+             (u.LastName ?? "").ToLower().Contains(qLower)
+         );
+     }
+
+     users = await q.OrderBy(u => u.Email).ToListAsync();
+
+     userRoles.Clear();
+     foreach (var u in users)
+     {
+         var roles = await UserManager.GetRolesAsync(u);
+         userRoles[u.Id] = roles.ToList();
+     }
+     StateHasChanged();
  }
- StateHasChanged();
+
+ private Task SearchAsync() => LoadUsersAsync(searchQuery);
+
+ private Task ClearSearch()
+ {
+     searchQuery = null;
+     return LoadUsersAsync();
+ }
+
+ // explicit ShowAll to make it obvious to users
+ private Task ShowAll()
+ {
+     searchQuery = null;
+     return LoadUsersAsync();
  }
 
  private void BeginEdit(MeowsicLabzzUser u)
@@ -147,7 +189,7 @@ else
  await JS.InvokeVoidAsync("alert", "Failed to update user: " + string.Join("; ", result.Errors.Select(e => e.Description)));
  }
  editingUserId = null;
- await LoadUsersAsync();
+ await LoadUsersAsync(searchQuery);
  }
 
  private async Task ToggleAdminAsync(MeowsicLabzzUser user)
@@ -171,7 +213,7 @@ else
  {
  await JS.InvokeVoidAsync("alert", "Role update failed: " + string.Join("; ", res.Errors.Select(e => e.Description)));
  }
- await LoadUsersAsync();
+ await LoadUsersAsync(searchQuery);
  }
 
  private async Task DeleteUserAsync(string userId)
@@ -185,7 +227,7 @@ else
  {
  await JS.InvokeVoidAsync("alert", "Delete failed: " + string.Join("; ", res.Errors.Select(e => e.Description)));
  }
- await LoadUsersAsync();
+ await LoadUsersAsync(searchQuery);
  }
 
  private void GoBack()

@@ -29,6 +29,8 @@ builder.Services.AddIdentity<MeowsicLabzzUser, IdentityRole>(options =>
 {
  options.SignIn.RequireConfirmedAccount = false;
 })
+ 
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddSignInManager()
 .AddDefaultTokenProviders();

@@ -1,15 +1,21 @@
 ﻿@page "/albums/create"
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Authorization
 @using MeowsicLabzz.Components.Domain
 @inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
+@attribute [Authorize(Roles = "Administrator")]
 <PageTitle>Create</PageTitle>
 
 <h1>Create</h1>
 
 <h2>Album</h2>
 <hr />
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
 <div class="row">
     <div class="col-md-4">
         <EditForm method="post" Model="Album" OnValidSubmit="AddAlbum" FormName="create" Enhance>
@@ -40,15 +46,33 @@
 </div>
 
 @code {
-    [SupplyParameterFromForm]
     private Album Album { get; set; } = new();
+    private string? errorMessage;
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddAlbum()
     {
         using var context = DbFactory.CreateDbContext();
-        context.Albums.Add(Album);
-        await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/albums");
+
+        // Optional: validate foreign keys to give clearer feedback instead of DB exception
+        var artistExists = await context.Set<MeowsicLabzz.Components.Domain.Artist>().AnyAsync(a => a.Id == Album.ArtistId);
+        var genreExists = await context.Set<MeowsicLabzz.Components.Domain.Genre>().AnyAsync(g => g.Id == Album.GenreId);
+        if (!artistExists || !genreExists)
+        {
+            errorMessage = "ArtistId or GenreId not found. Please select valid IDs.";
+            return;
+        }
+
+        try
+        {
+            context.Albums.Add(Album);
+            await context.SaveChangesAsync();
+            NavigationManager.NavigateTo("/albums");
+        }
+        catch (Exception ex)
+        {
+            // Surface DB exceptions to UI so you can see why creation failed
+            errorMessage = ex.Message;
+        }
     }
 }
