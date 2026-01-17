@@ -8,29 +8,29 @@ namespace MeowsicLabzz.Configurations.Entities
 	{
 		public void Configure(EntityTypeBuilder<Artist> builder)
 		{   
-			var now = DateTime.Now.ToString("o");
+			
 			builder.HasData(
 				new Artist { Id =1, Name = "Billie Eilish",
 					ArtistType = "Soloist",
 					Gender = "Female",
-					CreatedAt = now,
-                    UpdatedAt = now,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
                     CreatedBy = "System",
                     UpdatedBy = "System"
                 },
 				new Artist { Id =2, Name = "Stray Kids",
 					ArtistType = "Group",
 					Gender = "Male",
-                    CreatedAt = now,
-                    UpdatedAt = now,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
                     CreatedBy = "System",
                     UpdatedBy = "System"
                 },
 				new Artist { Id =3, Name = "Ariana Grande",
 					ArtistType = "Soloist",
 					Gender = "Female",
-                    CreatedAt = now,
-                    UpdatedAt = now,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
                     CreatedBy = "System",
                     UpdatedBy = "System"
                 }
