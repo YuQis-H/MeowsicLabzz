@@ -6,7 +6,7 @@
 @inject NavigationManager NavigationManager
 
 <h3>🎭 Manage Moods</h3>
-<button type="button" class="btn btn-secondary mb-3" @onclick="GoBack">← Back to Admin</button>
+<NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
 
 <div class="mb-3">
  <input class="form-control" placeholder="New mood name" @bind="newName" />

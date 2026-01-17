@@ -6,128 +6,84 @@
 @inject NavigationManager NavigationManager
 
 <h3>🎤 Manage Artists</h3>
-<button type="button" class="btn btn-secondary mb-3" @onclick="GoBack">← Back to Admin</button>
-
-<div class="row mb-3">
-    <div class="col-md-4">
-        <select class="form-select" @bind="filterType">
-            <option value="All">All</option>
-            <option value="Soloist">Soloist</option>
-            <option value="Group">Group</option>
-        </select>
-    </div>
-</div>
+<NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
 
 <div class="mb-3">
-    <input class="form-control mb-2" placeholder="New artist name" @bind="newName" />
-    <div class="d-flex gap-2 mb-2">
-        <select class="form-select w-auto" @bind="newType">
-            <option value="Soloist">Soloist</option>
-            <option value="Group">Group</option>
-        </select>
-        <select class="form-select w-auto" @bind="newGender">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-
-        </select>
-        <button type="button" class="btn btn-primary" @onclick="AddArtist">Add Artist</button>
-    </div>
+ <input class="form-control" placeholder="New artist name" @bind="newName" />
+ <button class="btn btn-primary mt-2" @onclick="AddArtist">Add Artist</button>
 </div>
 
 @if (artists is null)
 {
-    <p><em>Loading...</em></p>
+ <p><em>Loading...</em></p>
 }
 else if (!artists.Any())
 {
-    <p>No artists found.</p>
+ <p>No artists found.</p>
 }
 else
 {
-    <table class="table table-sm">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Gender</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var a in artists)
-            {
-                <tr>
-                    <td>@a.Id</td>
-                    <td>@a.Name</td>
-                    <td>@a.ArtistType</td>
-                    <td>@a.Gender</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteArtist(a.Id)">Delete</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+ <table class="table table-sm">
+ <thead>
+ <tr>
+ <th>Id</th>
+ <th>Name</th>
+ <th></th>
+ </tr>
+ </thead>
+ <tbody>
+ @foreach (var a in artists)
+ {
+ <tr>
+ <td>@a.Id</td>
+ <td>@a.Name</td>
+ <td>
+ <button class="btn btn-danger btn-sm" @onclick="() => DeleteArtist(a.Id)">Delete</button>
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
 }
 
 @code {
-    private List<MeowsicLabzz.Components.Domain.Artist>? artists;
-    private string? newName;
-    private string newType = "Soloist";
-    private string newGender = "Mixed";
-    private string filterType = "All";
+ private List<MeowsicLabzz.Components.Domain.Artist>? artists;
+ private string? newName;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadArtists();
-    }
+ protected override async Task OnInitializedAsync()
+ {
+ await LoadArtists();
+ }
 
-    private async Task LoadArtists()
-    {
-        var query = Db.Artists.AsQueryable();
-        if (!string.IsNullOrEmpty(filterType) && filterType != "All")
-        {
-            query = query.Where(a => a.ArtistType == filterType);
-        }
-        artists = await query.OrderBy(a => a.Id).ToListAsync();
-        StateHasChanged();
-    }
+ private async Task LoadArtists()
+ {
+ artists = await Db.Artists.OrderBy(a => a.Id).ToListAsync();
+ StateHasChanged();
+ }
 
-    private async Task AddArtist()
-    {
-        if (string.IsNullOrWhiteSpace(newName))
-            return;
+ private async Task AddArtist()
+ {
+ if (string.IsNullOrWhiteSpace(newName))
+ return;
 
-        var artist = new MeowsicLabzz.Components.Domain.Artist { Name = newName.Trim(), ArtistType = newType, Gender = newGender };
-        Db.Artists.Add(artist);
-        await Db.SaveChangesAsync();
-        newName = string.Empty;
-        await LoadArtists();
-    }
+ var artist = new MeowsicLabzz.Components.Domain.Artist { Name = newName.Trim() };
+ Db.Artists.Add(artist);
+ await Db.SaveChangesAsync();
+ newName = string.Empty;
+ await LoadArtists();
+ }
 
-    private async Task DeleteArtist(int id)
-    {
-        var entity = await Db.Artists.FindAsync(id);
-        if (entity is null) return;
-        Db.Artists.Remove(entity);
-        await Db.SaveChangesAsync();
-        await LoadArtists();
-    }
+ private async Task DeleteArtist(int id)
+ {
+ var entity = await Db.Artists.FindAsync(id);
+ if (entity is null) return;
+ Db.Artists.Remove(entity);
+ await Db.SaveChangesAsync();
+ await LoadArtists();
+ }
 
-    private void GoBack()
-    {
-        NavigationManager.NavigateTo("/admin");
-    }
-
-    // Reload when filter changed
-    private string FilterType
-    {
-        get => filterType;
-        set
-        {
-            filterType = value;
-            _ = LoadArtists();
-        }
-    }
+ private void GoBack()
+ {
+ NavigationManager.NavigateTo("/admin");
+ }
 }

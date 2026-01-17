@@ -1,17 +1,234 @@
 ﻿@page "/admin/songs"
 
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
 @attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
-<h3>Songs</h3>
-<button type="button" class="btn btn-secondary mb-3" @onclick="GoBack">← Back to Admin</button>
+<h3>🎵 Manage Songs</h3>
+<NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
 
-<h5>Songs are displayed here.</h5>
+<div class="card mb-3 p-3 bg-purple">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label">Title</label>
+            <input class="form-control" @bind="newTitle" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Artist</label>
+            <select class="form-select" @bind="NewArtistId">
+                <option value="0">Choose...</option>
+                @foreach (var a in artists)
+                {
+                    <option value="@a.Id">@a.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Album</label>
+            <select class="form-select" @bind="newAlbumId">
+                <option value="0">Choose...</option>
+                @foreach (var al in albums)
+                {
+                    <option value="@al.Id">@al.Title</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Genre</label>
+            <select class="form-select" @bind="newGenreId">
+                <option value="0">Choose...</option>
+                @foreach (var g in genres)
+                {
+                    <option value="@g.Id">@g.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-primary w-100" @onclick="AddSong">Add</button>
+        </div>
+    </div>
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="mt-2 alert @statusCss">@statusMessage</div>
+    }
+</div>
+
+@if (songRows is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!songRows.Any())
+{
+    <p>No songs found.</p>
+}
+else
+{
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Artist</th>
+                <th>Album</th>
+                <th>Genre</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in songRows)
+            {
+                <tr>
+                    <td>@s.Id</td>
+                    <td>@s.Title</td>
+                    <td>@s.ArtistName</td>
+                    <td>@s.AlbumTitle</td>
+                    <td>@s.GenreName</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => DeleteSong(s.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
 @code {
+    private List<(int Id, string Title, string ArtistName, string AlbumTitle, string GenreName)>? songRows;
+    private List<MeowsicLabzz.Components.Domain.Artist> artists = new();
+    private List<MeowsicLabzz.Components.Domain.Album> albums = new();
+    private List<MeowsicLabzz.Components.Domain.Genre> genres = new();
 
- private void GoBack()
- {
- NavigationManager.NavigateTo("/admin");
- }
+    private string? newTitle;
+    private int newArtistId;
+    private int newAlbumId;
+    private int newGenreId;
+
+    private string? statusMessage;
+    private string statusCss = "alert-info";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadLookups();
+        await LoadSongs();
+    }
+
+    private async Task LoadLookups()
+    {
+        artists = await Db.Artists.OrderBy(a => a.Name).ToListAsync();
+        // don't load all albums by default; wait until an artist is selected
+        albums = new List<MeowsicLabzz.Components.Domain.Album>();
+        genres = await Db.Genres.OrderBy(g => g.Name).ToListAsync();
+    }
+
+    private async Task LoadAlbumsForArtist(int artistId)
+    {
+        if (artistId == 0)
+        {
+            albums = new List<MeowsicLabzz.Components.Domain.Album>();
+        }
+        else
+        {
+            albums = await Db.Albums.Where(al => al.ArtistId == artistId).OrderBy(al => al.Title).ToListAsync();
+        }
+        // clear album selection when artist changes
+        newAlbumId = 0;
+        StateHasChanged();
+    }
+
+    private async Task LoadSongs()
+    {
+        var temp = await Db.Songs
+            .Select(s => new
+            {
+                s.Id,
+                s.Title,
+                ArtistName = Db.Artists.Where(a => a.Id == s.ArtistId).Select(a => a.Name).FirstOrDefault(),
+                AlbumTitle = Db.Albums.Where(al => al.Id == s.AlbumId).Select(al => al.Title).FirstOrDefault(),
+                GenreName = Db.Genres.Where(g => g.Id == s.GenreId).Select(g => g.Name).FirstOrDefault()
+            })
+            .OrderBy(s => s.Id)
+            .ToListAsync();
+
+        // convert anonymous objects to tuples
+        songRows = temp.Select(x => (x.Id, x.Title ?? string.Empty, x.ArtistName ?? string.Empty, x.AlbumTitle ?? string.Empty, x.GenreName ?? string.Empty)).ToList();
+        StateHasChanged();
+    }
+
+    private async Task AddSong()
+    {
+        if (string.IsNullOrWhiteSpace(newTitle) || newArtistId == 0 || newAlbumId == 0 || newGenreId == 0)
+        {
+            statusMessage = "Please fill title, artist, album and genre.";
+            statusCss = "alert-warning";
+            return;
+        }
+
+        try
+        {
+            var song = new MeowsicLabzz.Components.Domain.Song
+            {
+                Title = newTitle!.Trim(),
+                ArtistId = newArtistId,
+                AlbumId = newAlbumId,
+                GenreId = newGenreId,
+                Duration = 0
+            };
+            Db.Songs.Add(song);
+            await Db.SaveChangesAsync();
+
+            statusMessage = "Song added.";
+            statusCss = "alert-success";
+
+            // clear and reload
+            newTitle = string.Empty;
+            newArtistId = 0;
+            newAlbumId = 0;
+            newGenreId = 0;
+            albums = new List<MeowsicLabzz.Components.Domain.Album>();
+            await LoadSongs();
+        }
+        catch (Exception ex)
+        {
+            statusMessage = "Error adding song: " + ex.Message;
+            statusCss = "alert-danger";
+        }
+    }
+
+    private async Task DeleteSong(int id)
+    {
+        try
+        {
+            var entity = await Db.Songs.FindAsync(id);
+            if (entity is null)
+            {
+                statusMessage = "Song not found.";
+                statusCss = "alert-warning";
+                return;
+            }
+            Db.Songs.Remove(entity);
+            await Db.SaveChangesAsync();
+            statusMessage = "Song deleted.";
+            statusCss = "alert-success";
+            await LoadSongs();
+        }
+        catch (Exception ex)
+        {
+            statusMessage = "Error deleting song: " + ex.Message;
+            statusCss = "alert-danger";
+        }
+    }
+
+    // property-backed setter so album dropdown reloads when artist is selected
+    private int NewArtistId
+    {
+        get => newArtistId;
+        set
+        {
+            newArtistId = value;
+            _ = LoadAlbumsForArtist(value);
+        }
+    }
 }

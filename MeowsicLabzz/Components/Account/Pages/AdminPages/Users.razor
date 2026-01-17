@@ -1,13 +1,193 @@
 ﻿@page "/admin/users"
 
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Identity
+@using MeowsicLabzz.Data
 @attribute [Authorize(Roles = "Administrator")]
+
+@inject UserManager<MeowsicLabzzUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <h3>Users' Accounts</h3>
-<button type="button" class="btn btn-secondary mb-3" @onclick="GoBack">← Back to Admin</button>
+<NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
+
+@if (users is null)
+{
+ <p><em>Loading...</em></p>
+}
+else if (!users.Any())
+{
+ <p>No users found.</p>
+}
+else
+{
+ <table class="table table-sm">
+ <thead>
+ <tr>
+ <th>Email</th>
+ <th>First name</th>
+ <th>Last name</th>
+ <th>Roles</th>
+ <th></th>
+ </tr>
+ </thead>
+ <tbody>
+ @foreach (var u in users)
+ {
+ <tr>
+ <td>@u.Email</td>
+ <td>
+ @if (editingUserId == u.Id)
+ {
+ <input class="form-control" @bind="editFirstName" />
+ }
+ else
+ {
+ @u.FirstName
+ }
+ </td>
+ <td>
+ @if (editingUserId == u.Id)
+ {
+ <input class="form-control" @bind="editLastName" />
+ }
+ else
+ {
+ @u.LastName
+ }
+ </td>
+ <td>
+ @if (userRoles.TryGetValue(u.Id, out var roles))
+ {
+ @string.Join(", ", roles)
+ }
+ </td>
+ <td>
+ @if (editingUserId == u.Id)
+ {
+ <div class="d-flex gap-2">
+ <button class="btn btn-success btn-sm" @onclick="() => SaveEditAsync(u.Id)">Save</button>
+ <button class="btn btn-secondary btn-sm" @onclick="CancelEdit">Cancel</button>
+ </div>
+ }
+ else
+ {
+ <div class="d-flex gap-2">
+ <button class="btn btn-outline-primary btn-sm" @onclick="() => BeginEdit(u)">Edit</button>
+ @if (userRoles.TryGetValue(u.Id, out var r) && r.Contains("Administrator"))
+ {
+ <button class="btn btn-warning btn-sm" @onclick="() => ToggleAdminAsync(u)">Demote</button>
+ }
+ else
+ {
+ <button class="btn btn-outline-warning btn-sm" @onclick="() => ToggleAdminAsync(u)">Promote</button>
+ }
+ <button class="btn btn-danger btn-sm" @onclick="() => DeleteUserAsync(u.Id)">Delete</button>
+ </div>
+ }
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
+}
 
 @code {
+ private List<MeowsicLabzzUser>? users;
+ private Dictionary<string, List<string>> userRoles = new();
+
+ // edit state
+ private string? editingUserId;
+ private string? editFirstName;
+ private string? editLastName;
+
+ protected override async Task OnInitializedAsync()
+ {
+ await LoadUsersAsync();
+ }
+
+ private async Task LoadUsersAsync()
+ {
+ users = await UserManager.Users.OrderBy(u => u.Email).ToListAsync();
+ userRoles.Clear();
+ foreach (var u in users)
+ {
+ var roles = await UserManager.GetRolesAsync(u);
+ userRoles[u.Id] = roles.ToList();
+ }
+ StateHasChanged();
+ }
+
+ private void BeginEdit(MeowsicLabzzUser u)
+ {
+ editingUserId = u.Id;
+ editFirstName = u.FirstName;
+ editLastName = u.LastName;
+ }
+
+ private void CancelEdit()
+ {
+ editingUserId = null;
+ editFirstName = null;
+ editLastName = null;
+ }
+
+ private async Task SaveEditAsync(string userId)
+ {
+ var user = await UserManager.FindByIdAsync(userId);
+ if (user is null) return;
+ user.FirstName = editFirstName;
+ user.LastName = editLastName;
+ var result = await UserManager.UpdateAsync(user);
+ if (!result.Succeeded)
+ {
+ await JS.InvokeVoidAsync("alert", "Failed to update user: " + string.Join("; ", result.Errors.Select(e => e.Description)));
+ }
+ editingUserId = null;
+ await LoadUsersAsync();
+ }
+
+ private async Task ToggleAdminAsync(MeowsicLabzzUser user)
+ {
+ var isAdmin = await UserManager.IsInRoleAsync(user, "Administrator");
+ IdentityResult res;
+ if (isAdmin)
+ {
+ res = await UserManager.RemoveFromRoleAsync(user, "Administrator");
+ }
+ else
+ {
+ // ensure role exists
+ if (!await RoleManager.RoleExistsAsync("Administrator"))
+ {
+ await RoleManager.CreateAsync(new IdentityRole("Administrator"));
+ }
+ res = await UserManager.AddToRoleAsync(user, "Administrator");
+ }
+ if (!res.Succeeded)
+ {
+ await JS.InvokeVoidAsync("alert", "Role update failed: " + string.Join("; ", res.Errors.Select(e => e.Description)));
+ }
+ await LoadUsersAsync();
+ }
+
+ private async Task DeleteUserAsync(string userId)
+ {
+ var ok = await JS.InvokeAsync<bool>("confirm", "Delete this user? This cannot be undone.");
+ if (!ok) return;
+ var user = await UserManager.FindByIdAsync(userId);
+ if (user is null) return;
+ var res = await UserManager.DeleteAsync(user);
+ if (!res.Succeeded)
+ {
+ await JS.InvokeVoidAsync("alert", "Delete failed: " + string.Join("; ", res.Errors.Select(e => e.Description)));
+ }
+ await LoadUsersAsync();
+ }
+
  private void GoBack()
  {
  NavigationManager.NavigateTo("/admin");

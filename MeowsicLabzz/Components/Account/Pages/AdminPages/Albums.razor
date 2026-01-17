@@ -1,17 +1,168 @@
 ﻿@page "/admin/albums"
 
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
 @attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
 @inject NavigationManager NavigationManager
 
-<h3>Albums</h3>
-<button type="button" class="btn btn-secondary mb-3" @onclick="GoBack">← Back to Admin</button>
+<h3>💿 Manage Albums</h3>
+<NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
 
-<h5>Albums are saved here.</h5>
+<div class="card mb-3 p-3 bg-purple">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-6">
+            <label class="form-label">Title</label>
+            <input class="form-control" @bind="newTitle" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Artist</label>
+            <select class="form-select" @bind="newArtistId">
+                <option value="0">Choose...</option>
+                @foreach (var a in artists)
+                {
+                    <option value="@a.Id">@a.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-primary w-100" @onclick="AddAlbum">Add</button>
+        </div>
+    </div>
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="mt-2 alert @statusCss">@statusMessage</div>
+    }
+</div>
+
+@if (albumRows is null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (!albumRows.Any())
+{
+    <p>No albums found.</p>
+}
+else
+{
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Artist</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var al in albumRows)
+            {
+                <tr>
+                    <td>@al.Id</td>
+                    <td>@al.Title</td>
+                    <td>@al.ArtistName</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => DeleteAlbum(al.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
- private void GoBack()
- {
- NavigationManager.NavigateTo("/admin");
- }
+    private List<(int Id, string Title, string ArtistName)>? albumRows;
+    private List<MeowsicLabzz.Components.Domain.Artist> artists = new();
+
+    private string? newTitle;
+    private int newArtistId;
+
+    private string? statusMessage;
+    private string statusCss = "alert-info";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadLookups();
+        await LoadAlbums();
+    }
+
+    private async Task LoadLookups()
+    {
+        artists = await Db.Artists.OrderBy(a => a.Name).ToListAsync();
+    }
+
+    private async Task LoadAlbums()
+    {
+        var temp = await Db.Albums
+            .Select(al => new
+            {
+                al.Id,
+                al.Title,
+                ArtistName = Db.Artists.Where(a => a.Id == al.ArtistId).Select(a => a.Name).FirstOrDefault()
+            })
+            .OrderBy(al => al.Id)
+            .ToListAsync();
+
+        albumRows = temp.Select(x => (x.Id, x.Title ?? string.Empty, x.ArtistName ?? string.Empty)).ToList();
+        StateHasChanged();
+    }
+
+    private async Task AddAlbum()
+    {
+        if (string.IsNullOrWhiteSpace(newTitle) || newArtistId ==0)
+        {
+            statusMessage = "Please enter a title and select an artist.";
+            statusCss = "alert-warning";
+            return;
+        }
+
+        try
+        {
+            var album = new MeowsicLabzz.Components.Domain.Album
+            {
+                Title = newTitle!.Trim(),
+                ArtistId = newArtistId
+            };
+            Db.Albums.Add(album);
+            await Db.SaveChangesAsync();
+
+            statusMessage = "Album added.";
+            statusCss = "alert-success";
+
+            newTitle = string.Empty;
+            newArtistId =0;
+            await LoadAlbums();
+        }
+        catch (Exception ex)
+        {
+            statusMessage = "Error adding album: " + ex.Message;
+            statusCss = "alert-danger";
+        }
+    }
+
+    private async Task DeleteAlbum(int id)
+    {
+        try
+        {
+            var entity = await Db.Albums.FindAsync(id);
+            if (entity is null)
+            {
+                statusMessage = "Album not found.";
+                statusCss = "alert-warning";
+                return;
+            }
+            Db.Albums.Remove(entity);
+            await Db.SaveChangesAsync();
+            statusMessage = "Album deleted.";
+            statusCss = "alert-success";
+            await LoadAlbums();
+        }
+        catch (Exception ex)
+        {
+            statusMessage = "Error deleting album: " + ex.Message;
+            statusCss = "alert-danger";
+        }
+    }
+
+    private void GoBack() => NavigationManager.NavigateTo("/admin");
 }
