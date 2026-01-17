@@ -15,8 +15,8 @@ namespace MeowsicLabzz.Configurations.Entities
                     Id = 1,
                     Name = "Chill Tunes",
                     Description = " ",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
+                    CreatedAt = DateTime.Now.ToString("o"),
+                    UpdatedAt = DateTime.Now.ToString("o"),
                     CreatedBy = "System",
                     UpdatedBy = "System"
                 },
@@ -25,8 +25,8 @@ namespace MeowsicLabzz.Configurations.Entities
                     Id = 3,
                     Name = "Study Music",
                     Description = " ",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
+                    CreatedAt = DateTime.Now.ToString("o"),
+                    UpdatedAt = DateTime.Now.ToString("o"),
                     CreatedBy = "System",
                     UpdatedBy = "System"
                 }

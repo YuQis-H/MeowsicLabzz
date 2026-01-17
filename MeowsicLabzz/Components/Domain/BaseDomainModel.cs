@@ -6,16 +6,16 @@ namespace MeowsicLabzz.Components.Domain
     {
         public int Id { get; set; }
 
-        
-        public DateTime CreatedAt { get; set; }
+        [NotMapped]
+        public string? CreatedAt { get; set; }
 
-        
-        public string?  CreatedBy { get; set; } 
+        [NotMapped]
+        public string? CreatedBy { get; set; }
 
-        
-        public DateTime UpdatedAt { get; set; }
+        [NotMapped]
+        public string? UpdatedAt { get; set; }
 
-        
+        [NotMapped]
         public string? UpdatedBy { get; set; }
     }
 }

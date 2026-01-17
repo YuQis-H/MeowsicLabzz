@@ -14,7 +14,6 @@
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
-@inject RoleManager<IdentityRole> RoleManager
 
 <PageTitle>Register</PageTitle>
 
@@ -95,19 +94,6 @@
             identityErrors = result.Errors;
             return;
         }
-
-
-        //create the user role if it doesn't exist
-        if (!await RoleManager.RoleExistsAsync("User"))
-        {
-
-            await RoleManager.CreateAsync(new IdentityRole("User"));
-        }
-        //add the user to the user role
-        await UserManager.AddToRoleAsync(user, "User");
-        //add the user id as claim when user registers
-        await UserManager.AddClaimAsync(user, new System.Security.Claims.Claim("userId", user.Id));
-
 
         Logger.LogInformation("User created a new account with password.");
 

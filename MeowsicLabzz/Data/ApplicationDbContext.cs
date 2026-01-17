@@ -20,10 +20,7 @@ namespace MeowsicLabzz.Data
 		public DbSet<Artist> Artists { get; set; } = default!;
 		public DbSet<Song> Songs { get; set; } = default!;
 		public DbSet<Album> Albums { get; set; } = default!;
-        public DbSet<MeowsicLabzz.Components.Domain.MusicDiscovery> MusicDiscovery { get; set; } = default!;
-        public DbSet<MeowsicLabzz.Components.Domain.Friends> Friends { get; set; } = default!;
-        public DbSet<MeowsicLabzz.Components.Domain.MyPlaylist> MyPlaylist { get; set; } = default!;
-        public DbSet<MeowsicLabzz.Components.Domain.User> User { get; set; } = default!;
+		
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -41,11 +38,10 @@ namespace MeowsicLabzz.Data
 			builder.ApplyConfiguration(new ArtistSeed());
 			builder.ApplyConfiguration(new AlbumSeed());
 			builder.ApplyConfiguration(new SongSeed());
-			builder.ApplyConfiguration(new MusicDiscoverySeed());
-			builder.ApplyConfiguration(new FriendsSeed());
-			builder.ApplyConfiguration(new MyPlaylistSeed());
-			
-        }
-	    
+		}
+	    public DbSet<MeowsicLabzz.Components.Domain.MusicDiscovery> MusicDiscovery { get; set; } = default!;
+	    public DbSet<MeowsicLabzz.Components.Domain.Friends> Friends { get; set; } = default!;
+	    public DbSet<MeowsicLabzz.Components.Domain.MyPlaylist> MyPlaylist { get; set; } = default!;
+	    public DbSet<MeowsicLabzz.Components.Domain.User> User { get; set; } = default!;
 	}
 }

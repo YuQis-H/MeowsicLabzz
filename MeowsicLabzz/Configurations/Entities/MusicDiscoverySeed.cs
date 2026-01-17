@@ -10,7 +10,7 @@ namespace MeowsicLabzz.Configurations.Entities
         {
             builder.HasData(
                 new MusicDiscovery { Id = 1 },
-                new MusicDiscovery { Id = 2 }
+                new MusicDiscovery { Id = 3 }
             );
         }
     }

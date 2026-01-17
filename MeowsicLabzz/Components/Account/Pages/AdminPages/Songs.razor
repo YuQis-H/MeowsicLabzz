@@ -3,7 +3,6 @@
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize(Roles = "Administrator")]
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
 
 <h3>Songs</h3>
 <button type="button" class="btn btn-secondary mb-3" @onclick="GoBack">← Back to Admin</button>
@@ -11,9 +10,8 @@
 <h5>Songs are displayed here.</h5>
 @code {
 
-    private async Task GoBack()
-    {
-        // Use browser history to go back one entry
-        await JS.InvokeVoidAsync("history.back");
-    }
+ private void GoBack()
+ {
+ NavigationManager.NavigateTo("/admin");
+ }
 }
