@@ -22,7 +22,7 @@ namespace MeowsicLabzz.Configurations.Entities
 					CreatedBy = "System",
 					UpdatedBy = "System"
 				},
-				new Album { Id =3, Title = "Positions", ArtistId =3, GenreId =1,
+				new Album { Id =3, Title = "Positions", ArtistId =3, GenreId =3,
 					CreatedAt = now,
 					UpdatedAt = now,
 					CreatedBy = "System",

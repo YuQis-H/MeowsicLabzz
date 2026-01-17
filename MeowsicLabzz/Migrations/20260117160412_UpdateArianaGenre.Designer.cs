@@ -4,6 +4,7 @@ using MeowsicLabzz.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MeowsicLabzz.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class IdentityContextModelSnapshot : ModelSnapshot
+    [Migration("20260117160412_UpdateArianaGenre")]
+    partial class UpdateArianaGenre
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,22 +109,16 @@ namespace MeowsicLabzz.Migrations
                         new
                         {
                             Id = 1,
-                            ArtistType = "Soloist",
-                            Gender = "Female",
                             Name = "Billie Eilish"
                         },
                         new
                         {
                             Id = 2,
-                            ArtistType = "Group",
-                            Gender = "Male",
                             Name = "Stray Kids"
                         },
                         new
                         {
                             Id = 3,
-                            ArtistType = "Soloist",
-                            Gender = "Female",
                             Name = "Ariana Grande"
                         });
                 });
@@ -326,7 +323,7 @@ namespace MeowsicLabzz.Migrations
                             AlbumId = 5,
                             ArtistId = 2,
                             Duration = 0,
-                            GenreId = 2,
+                            GenreId = 1,
                             Title = "God's Menu"
                         },
                         new
@@ -335,7 +332,7 @@ namespace MeowsicLabzz.Migrations
                             AlbumId = 3,
                             ArtistId = 3,
                             Duration = 0,
-                            GenreId = 3,
+                            GenreId = 1,
                             Title = "positions"
                         },
                         new
@@ -449,7 +446,7 @@ namespace MeowsicLabzz.Migrations
                         {
                             Id = "3781efa7-66dc-47f0-860f-e506d04102e4",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1018eb9a-6b53-48b9-87de-2f1454569870",
+                            ConcurrencyStamp = "0a6bebd9-4aa3-4f05-b079-307f9de56e90",
                             Email = "admin@localhost.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -457,9 +454,9 @@ namespace MeowsicLabzz.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@LOCALHOST.COM",
                             NormalizedUserName = "ADMIN@LOCALHOST.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFs9wc0lQNfSPvJhZAN2ATNI5gFxuvPTiemhz+KwD58LWv0N2wUUeKGSzXb7R9a01Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIk7VOAEMW0F9VEvfX+2UD6IwuJrHXtkInR62CUsiio6wX/5RonMRIV6e3slXiuuug==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4547ca33-b134-466c-9785-714f7a7c2709",
+                            SecurityStamp = "47fab45b-1bfb-4cab-9fa6-69fde3d4f787",
                             TwoFactorEnabled = false,
                             UserName = "admin@localhost.com"
                         });
