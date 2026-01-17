@@ -20,6 +20,28 @@
     </div>
 </header>
 
+<!-- Today's Trendings board -->
+<section class="trending-board" aria-label="Today's Trendings">
+    <h2 class="trending-heading">Today's Trendings:</h2>
+
+    <ul class="trending-list" role="list">
+        <li class="trending-item">
+            <a class="trending-link" href="https://www.youtube.com/watch?v=DyDfgMOUjCI" target="_blank" rel="noopener noreferrer">Bad Guy</a>
+            <div class="track-artist">Billie Eilish</div>
+        </li>
+
+        <li class="trending-item">
+            <a class="trending-link" href="https://www.youtube.com/watch?v=APB-AKpnKT4" target="_blank" rel="noopener noreferrer">MANIAC</a>
+            <div class="track-artist">Stray Kids</div>
+        </li>
+
+        <li class="trending-item">
+            <a class="trending-link" href="https://www.youtube.com/watch?v=iP6XpLQM2Cs" target="_blank" rel="noopener noreferrer">Tik Tok</a>
+            <div class="track-artist">Ke$ha</div>
+        </li>
+    </ul>
+</section>
+
 <main class="md-content">
     <section>
         <p>Explore trending tracks based on your mood here!</p>
@@ -94,6 +116,65 @@
     font-size: .8rem;
 }
 
+/* Trending board - bordered list of tracks */
+.trending-board {
+    max-width: 1100px;
+    margin: 0 auto 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    box-sizing: border-box;
+}
+
+.trending-heading {
+    margin: 0 0 .6rem 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--md-header-color, #fff);
+}
+
+/* list styling */
+.trending-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.trending-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.45rem;
+    border-radius: 6px;
+    transition: background-color 0.12s ease;
+}
+
+.trending-item:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.trending-link {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.98rem;
+}
+
+.trending-link:hover,
+.trending-link:focus {
+    text-decoration: underline;
+    outline: none;
+}
+
+.track-artist {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.85);
+    margin-top: 0.18rem;
+}
+
 /* content area */
 .md-content {
     max-width: 1100px;
@@ -102,12 +183,10 @@
 }
 
 /* Responsive tweaks */
-
-    .md-header {
-        padding: 1rem;
-    }
-    .md-icon { width:52px; height:52px; }
-    .md-title { font-size: 1.25rem; }
-    .md-subtitle { font-size: .9rem; }
+.md-header {
+    padding: 1rem;
 }
+.md-icon { width:52px; height:52px; }
+.md-title { font-size: 1.25rem; }
+.md-subtitle { font-size: .9rem; }
 </style>
