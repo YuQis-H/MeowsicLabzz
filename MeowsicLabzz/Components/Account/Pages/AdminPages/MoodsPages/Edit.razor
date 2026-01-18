@@ -1,3 +1,63 @@
 @page "/admin/moods/edit"
+@using Microsoft.EntityFrameworkCore
 @using MeowsicLabzz.Components.Domain
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Administrator")]
+@inject MeowsicLabzz.Data.ApplicationDbContext Db
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Mood (Admin)</PageTitle>
+
+<h3>Edit Mood (Admin)</h3>
+
+@if (MoodModel is null)
+{
+ <p><em>Loading...</em></p>
+}
+else
+{
+ <div class="card mb-3 p-3 bg-purple">
+ <EditForm Model="MoodModel" OnValidSubmit="UpdateMood">
+ <DataAnnotationsValidator />
+ <ValidationSummary class="text-danger" />
+
+ <div class="mb-3">
+ <label class="form-label">Id:</label>
+ <InputNumber class="form-control bg-light" @bind-Value="MoodModel.Id" Disabled="true" />
+ </div>
+
+ <div class="mb-3">
+ <label class="form-label">Name:</label>
+ <InputText class="form-control" @bind-Value="MoodModel.Name" />
+ <ValidationMessage For="() => MoodModel.Name" class="text-danger" />
+ </div>
+
+ <button type="submit" class="btn btn-primary">Save</button>
+ </EditForm>
+ </div>
+}
+
+<div>
+ <a href="/admin/moods">Back to List</a>
+</div>
+
+@code {
+ [SupplyParameterFromQuery]
+ private int Id { get; set; }
+
+ private MeowsicLabzz.Components.Domain.Mood? MoodModel { get; set; }
+
+ protected override async Task OnInitializedAsync()
+ {
+ MoodModel = await Db.Moods.FirstOrDefaultAsync(m => m.Id == Id);
+ if (MoodModel is null) NavigationManager.NavigateTo("/notfound");
+ }
+
+ private async Task UpdateMood()
+ {
+ Db.Attach(MoodModel!).State = EntityState.Modified;
+ await Db.SaveChangesAsync();
+ NavigationManager.NavigateTo("/admin/moods");
+ }
+}
 

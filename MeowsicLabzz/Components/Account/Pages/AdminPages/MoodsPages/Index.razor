@@ -10,9 +10,8 @@
 
 <h3>?? Manage Moods (Admin)</h3>
 
-<p>
- <a href="/admin/moods/create">Create New</a>
-</p>
+<NavLink class="btn btn-secondary mb-3" href="/admin">? Back to Admin</NavLink>
+<NavLink class="btn btn-primary mb-3 ms-2" href="/admin/moods/create">Create New</NavLink>
 
 <QuickGrid Class="table" Items="context.Moods">
  <PropertyColumn Property="mood => mood.Id" />

@@ -1,1 +1,51 @@
 @page "/admin/moods/delete"
+@using Microsoft.EntityFrameworkCore
+@using MeowsicLabzz.Components.Domain
+@using MeowsicLabzz.Data
+@inject IDbContextFactory<MeowsicLabzz.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete Mood (Admin)</PageTitle>
+
+<h3>Delete Mood (Admin)</h3>
+
+@if (mood is null)
+{
+ <p><em>Loading...</em></p>
+}
+else
+{
+ <div class="card mb-3 p-3 bg-purple">
+ <h4>Mood</h4>
+ <dl class="row">
+ <dt class="col-sm-2">Name</dt>
+ <dd class="col-sm-10">@mood.Name</dd>
+ </dl>
+ <EditForm method="post" Model="mood" OnValidSubmit="DeleteMood" FormName="delete" Enhance>
+ <button type="submit" class="btn btn-danger" disabled="@(mood is null)">Delete</button>
+ <a class="btn btn-link" href="/admin/moods">Back to List</a>
+ </EditForm>
+ </div>
+}
+
+@code {
+ [SupplyParameterFromQuery]
+ private int Id { get; set; }
+
+ private MeowsicLabzz.Components.Domain.Mood? mood;
+
+ protected override async Task OnInitializedAsync()
+ {
+ using var context = DbFactory.CreateDbContext();
+ mood = await context.Moods.FirstOrDefaultAsync(g => g.Id == Id);
+ if (mood is null) NavigationManager.NavigateTo("/notfound");
+ }
+
+ private async Task DeleteMood()
+ {
+ using var context = DbFactory.CreateDbContext();
+ context.Moods.Remove(mood!);
+ await context.SaveChangesAsync();
+ NavigationManager.NavigateTo("/admin/moods");
+ }
+}

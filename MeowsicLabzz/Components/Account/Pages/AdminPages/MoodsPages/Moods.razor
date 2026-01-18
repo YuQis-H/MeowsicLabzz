@@ -1,13 +1,14 @@
 ﻿@page "/admin/moods"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
 @attribute [Authorize(Roles = "Administrator")]
 @inject MeowsicLabzz.Data.ApplicationDbContext Db
 @inject NavigationManager NavigationManager
 
 <h3>🎭 Manage Moods</h3>
 <NavLink class="btn btn-secondary mb-3" href="/admin">← Back to Admin</NavLink>
-<NavLink class="btn btn-primary mb-3 ms-2" href="/moods/create">Create New Mood</NavLink>
+<NavLink class="btn btn-primary mb-3 ms-2" href="/admin/moods/create">Create New Mood</NavLink>
 
 @if (moods is null)
 {
@@ -19,30 +20,14 @@ else if (!moods.Any())
 }
 else
 {
- <table class="table table-sm">
- <thead>
- <tr>
- <th>Id</th>
- <th>Name</th>
- <th></th>
- </tr>
- </thead>
- <tbody>
- @foreach (var m in moods)
- {
- <tr>
- <td>@m.Id</td>
- <td>@m.Name</td>
- <td>
- <a class="me-2" href="@($"/moods/edit?id={m.Id}")">Edit</a>
- <AuthorizeView Roles="Administrator">
- <button class="btn btn-danger btn-sm" @onclick="() => DeleteMood(m.Id)">Delete</button>
- </AuthorizeView>
- </td>
- </tr>
- }
- </tbody>
- </table>
+ <QuickGrid Class="table" Items="Db.Moods">
+ <PropertyColumn Property="m => m.Id" />
+ <PropertyColumn Property="m => m.Name" />
+ <TemplateColumn Context="m">
+ <a class="me-2" href="@($"/admin/moods/edit?id={m.Id}")">Edit</a>
+ <a class="me-2" href="@($"/admin/moods/delete?id={m.Id}")">Delete</a>
+ </TemplateColumn>
+ </QuickGrid>
 }
 
 @code {
@@ -50,22 +35,8 @@ else
 
  protected override async Task OnInitializedAsync()
  {
- await LoadMoods();
- }
-
- private async Task LoadMoods()
- {
  moods = await Db.Moods.OrderBy(m => m.Id).ToListAsync();
  StateHasChanged();
- }
-
- private async Task DeleteMood(int id)
- {
- var entity = await Db.Moods.FindAsync(id);
- if (entity is null) return;
- Db.Moods.Remove(entity);
- await Db.SaveChangesAsync();
- await LoadMoods();
  }
 
  private void GoBack()
