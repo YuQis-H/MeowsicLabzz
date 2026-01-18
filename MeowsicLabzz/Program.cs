@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("IdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'IdentityContextConnection' not found.");
+//Add the API controller
+
+builder.Services.AddControllers();
 
 // Register a DbContextFactory for use in Blazor components (register before AddDbContext)
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
@@ -41,6 +44,9 @@ builder.Services.AddIdentity<MeowsicLabzzUser, IdentityRole>(options =>
 builder.Services.AddSingleton<IEmailSender<MeowsicLabzzUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
+
+//Add the Default controller route
+app.MapDefaultControllerRoute();
 
 // Apply migrations and ensure admin user is in Administrator role (development convenience)
 using (var scope = app.Services.CreateScope())
